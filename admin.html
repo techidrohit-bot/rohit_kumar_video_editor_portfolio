@@ -1,0 +1,1650 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Portfolio Admin — Rohit Kumar</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1a1a1a;
+      --border: rgba(255, 255, 255, 0.07);
+      --accent: #b060ff;
+      --accent-dim: rgba(176, 96, 255, 0.15);
+      --accent-glow: rgba(176, 96, 255, 0.35);
+      --text: #e8e8e8;
+      --text-muted: #888;
+      --red: #ff4d4d;
+      --green: #4dff91;
+      --radius-card: 12px;
+      --radius-input: 8px;
+      --transition: 0.22s ease;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ═══════════════════════════════════════════════
+       LOGIN SCREEN
+    ═══════════════════════════════════════════════ */
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 30% 20%, rgba(176, 96, 255, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 80%, rgba(176, 96, 255, 0.08) 0%, transparent 60%),
+        #0a0a0a;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    #login-screen.slide-out {
+      opacity: 0;
+      transform: translateY(-40px) scale(0.97);
+      pointer-events: none;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 48px 40px;
+      background: rgba(20, 20, 20, 0.7);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(176, 96, 255, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(176, 96, 255, 0.08);
+      text-align: center;
+    }
+
+    .login-logo {
+      width: 64px;
+      height: 64px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(176, 96, 255, 0.3);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--accent);
+      margin-bottom: 24px;
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+
+    .login-card h1 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .login-card p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    .login-field {
+      position: relative;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .login-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .login-field input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-input);
+      padding: 13px 16px;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .login-field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .login-field input.error {
+      border-color: var(--red) !important;
+      box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.15) !important;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-input);
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .login-btn:hover {
+      background: #c47aff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px var(--accent-glow);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .login-error {
+      color: var(--red);
+      font-size: 13px;
+      margin-top: 12px;
+      min-height: 20px;
+      transition: opacity var(--transition);
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      20% {
+        transform: translateX(-8px)
+      }
+
+      40% {
+        transform: translateX(8px)
+      }
+
+      60% {
+        transform: translateX(-6px)
+      }
+
+      80% {
+        transform: translateX(6px)
+      }
+    }
+
+    .shake {
+      animation: shake 0.4s ease;
+    }
+
+    /* ═══════════════════════════════════════════════
+       DASHBOARD LAYOUT
+    ═══════════════════════════════════════════════ */
+    #dashboard {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .admin-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 10, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .admin-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .admin-header .logo i {
+      color: var(--accent);
+      font-size: 20px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition);
+      text-decoration: none;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .btn-danger-ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 77, 77, 0.3);
+      color: #ff7070;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition);
+    }
+
+    .btn-danger-ghost:hover {
+      background: rgba(255, 77, 77, 0.1);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* Sync Banner */
+    .sync-banner {
+      background: rgba(176, 96, 255, 0.08);
+      border-bottom: 1px solid rgba(176, 96, 255, 0.15);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .sync-banner p {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sync-banner p i {
+      color: var(--accent);
+    }
+
+    .sync-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-sm {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all var(--transition);
+    }
+
+    .btn-sm:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-sm.accent {
+      background: var(--accent-dim);
+      border-color: rgba(176, 96, 255, 0.3);
+      color: var(--accent);
+    }
+
+    .btn-sm.accent:hover {
+      background: rgba(176, 96, 255, 0.25);
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .spinning {
+      animation: spin 0.75s linear infinite !important;
+      display: inline-block;
+    }
+
+    /* Body Layout */
+    .admin-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+    }
+
+    .sidebar-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0 8px;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-tab {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .sidebar-tab:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .sidebar-tab.active {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(176, 96, 255, 0.2);
+    }
+
+    .sidebar-tab i {
+      font-size: 16px;
+    }
+
+    .tab-count {
+      margin-left: auto;
+      background: var(--surface2);
+      color: var(--text-muted);
+      border-radius: 20px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .sidebar-tab.active .tab-count {
+      background: rgba(176, 96, 255, 0.2);
+      color: var(--accent);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px;
+      background: var(--bg);
+    }
+
+    .content-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .content-header h2 {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .content-header h2 span {
+      color: var(--accent);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: all var(--transition);
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      background: #c47aff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px var(--accent-glow);
+    }
+
+    /* Video Grid */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .video-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .video-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(176, 96, 255, 0.3);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+    }
+
+    .video-thumb {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .video-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .video-card:hover .video-thumb img {
+      transform: scale(1.04);
+    }
+
+    .video-thumb-short {
+      aspect-ratio: 9/16;
+      max-height: 220px;
+    }
+
+    .video-thumb-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .video-thumb-overlay i {
+      font-size: 36px;
+      color: #fff;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+    }
+
+    .video-card:hover .video-thumb-overlay {
+      opacity: 1;
+    }
+
+    .video-card-body {
+      padding: 14px 16px;
+    }
+
+    .video-card-body h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .video-card-body .yt-id {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: monospace;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .video-card-body .yt-id i {
+      color: #ff4040;
+    }
+
+    .video-card-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .video-card-actions {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px 14px;
+    }
+
+    .btn-edit,
+    .btn-delete {
+      flex: 1;
+      border: none;
+      border-radius: 7px;
+      padding: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-family: 'Nunito', sans-serif;
+      transition: all var(--transition);
+    }
+
+    .btn-edit {
+      background: rgba(176, 96, 255, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(176, 96, 255, 0.2);
+    }
+
+    .btn-edit:hover {
+      background: rgba(176, 96, 255, 0.22);
+    }
+
+    .btn-delete {
+      background: rgba(255, 77, 77, 0.08);
+      color: #ff7070;
+      border: 1px solid rgba(255, 77, 77, 0.2);
+    }
+
+    .btn-delete:hover {
+      background: rgba(255, 77, 77, 0.16);
+      color: var(--red);
+    }
+
+    /* Empty State */
+    .empty-state {
+      grid-column: 1/-1;
+      padding: 64px 32px;
+      text-align: center;
+    }
+
+    .empty-state .icon {
+      font-size: 56px;
+      color: var(--accent);
+      opacity: 0.3;
+      margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
+
+    .empty-state p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* ═══════════════════════════════════════════════
+       MODAL (Add/Edit)
+    ═══════════════════════════════════════════════ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid rgba(176, 96, 255, 0.2);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 560px;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
+      animation: modal-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @keyframes modal-in {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 6px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+    }
+
+    .modal-close:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-input);
+      padding: 12px 14px;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .form-group select option {
+      background: #1a1a1a;
+    }
+
+    .form-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .form-hint code {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    /* Live Preview */
+    .thumb-preview {
+      margin-top: 12px;
+      border-radius: 8px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      transition: all var(--transition);
+    }
+
+    .thumb-preview.short-preview {
+      aspect-ratio: 9/16;
+      max-height: 180px;
+    }
+
+    .thumb-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-preview .no-preview {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .thumb-preview .no-preview i {
+      font-size: 32px;
+      opacity: 0.3;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn-cancel {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .btn-cancel:hover {
+      border-color: var(--border);
+      color: var(--text);
+      background: #222;
+    }
+
+    /* ═══════════════════════════════════════════════
+       CONFIRM MODAL
+    ═══════════════════════════════════════════════ */
+    .confirm-box {
+      background: var(--surface);
+      border: 1px solid rgba(255, 77, 77, 0.25);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
+      animation: modal-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      padding: 32px 28px;
+      text-align: center;
+    }
+
+    .confirm-box .icon {
+      font-size: 44px;
+      color: var(--red);
+      margin-bottom: 16px;
+    }
+
+    .confirm-box h3 {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .confirm-box p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-confirm-delete {
+      flex: 1;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 11px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .btn-confirm-delete:hover {
+      background: #ff3333;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      animation: toast-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .toast.success {
+      border-color: rgba(77, 255, 145, 0.3);
+    }
+
+    .toast.success i {
+      color: var(--green);
+    }
+
+    .toast.error {
+      border-color: rgba(255, 77, 77, 0.3);
+    }
+
+    .toast.error i {
+      color: var(--red);
+    }
+
+    @keyframes toast-in {
+      from {
+        opacity: 0;
+        transform: translateX(20px) scale(0.9);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .admin-body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        min-width: unset;
+        flex-direction: row;
+        padding: 12px 16px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+      }
+
+      .sidebar-label {
+        display: none;
+      }
+
+      .sidebar-tab {
+        white-space: nowrap;
+      }
+
+      .main-content {
+        padding: 16px;
+      }
+
+      .sync-banner {
+        padding: 10px 16px;
+      }
+
+      .admin-header {
+        padding: 0 16px;
+      }
+
+      .video-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Hidden import input */
+    #import-input {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+
+
+  <!-- ═══════════════════════════════════════════════════════
+     DASHBOARD
+════════════════════════════════════════════════════════ -->
+  <div id="dashboard">
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="logo">
+        <i class="bi bi-shield-lock-fill"></i>
+        Portfolio Admin
+      </div>
+      <div class="header-actions">
+        <a href="index.html" class="btn-ghost" target="_blank">
+          <i class="bi bi-box-arrow-up-right"></i> View Portfolio
+        </a>
+
+      </div>
+    </header>
+
+    <!-- Sync Banner -->
+    <div class="sync-banner">
+      <p id="sync-status"><i class="bi bi-cloud-check-fill" style="color: #4dff91;"></i> <span
+          id="sync-status-text">Google Sheet connected. Click <strong>Sync from Sheet</strong> to pull live
+          changes.</span></p>
+      <div class="sync-actions">
+        <button class="btn-sm accent" id="sync-now-btn" title="Fetch latest videos from Google Sheet"><i
+            class="bi bi-arrow-repeat" id="sync-spinner"></i> Sync from Sheet</button>
+        <button class="btn-sm" id="copy-sheet-btn" title="Copy videos formatted for Google Sheet (Ctrl+V into Row 2)"><i
+            class="bi bi-clipboard-check"></i> Copy for Sheet</button>
+        <button class="btn-sm" id="csv-btn" title="Download CSV for Google Sheet import"><i
+            class="bi bi-file-earmark-spreadsheet"></i> Download CSV</button>
+        <button class="btn-sm" id="sheet-btn" title="View or change Google Sheet published CSV URL"><i
+            class="bi bi-link-45deg"></i> Sheet URL</button>
+        <button class="btn-sm" id="export-btn" title="Download JSON backup"><i class="bi bi-download"></i> Export
+          JSON</button>
+        <button class="btn-sm" id="import-btn" title="Upload JSON backup"><i class="bi bi-upload"></i> Import
+          JSON</button>
+        <input type="file" id="import-input" accept=".json" />
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="admin-body">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-label">Content</div>
+        <button class="sidebar-tab active" data-tab="long">
+          <i class="bi bi-play-btn-fill"></i> Long Videos
+          <span class="tab-count" id="long-count">0</span>
+        </button>
+        <button class="sidebar-tab" data-tab="short">
+          <i class="bi bi-phone"></i> Shorts
+          <span class="tab-count" id="short-count">0</span>
+        </button>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <div class="content-header">
+          <h2 id="section-title">Long <span>Videos</span></h2>
+          <button class="btn-primary" id="add-btn">
+            <i class="bi bi-plus-lg"></i> Add Video
+          </button>
+        </div>
+        <div class="video-grid" id="video-grid">
+          <!-- Cards rendered here -->
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+     ADD / EDIT MODAL
+════════════════════════════════════════════════════════ -->
+  <div class="modal-backdrop" id="form-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-title">Add Video</h3>
+        <button class="modal-close" id="modal-close-btn"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-id" />
+
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="f-title" placeholder="e.g. Brand Film for XYZ" />
+        </div>
+
+        <div class="form-group">
+          <label>YouTube Video ID</label>
+          <input type="text" id="f-ytid" placeholder="e.g. dQw4w9WgXcQ" />
+          <p class="form-hint">Only the ID, not the full URL. e.g. <code>dQw4w9WgXcQ</code> from
+            youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong></p>
+          <div class="thumb-preview" id="thumb-preview">
+            <div class="no-preview"><i class="bi bi-image"></i><span>Thumbnail preview</span></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Type</label>
+          <select id="f-type">
+            <option value="long">Long Video</option>
+            <option value="short">Short</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Description <span
+              style="font-weight:400;text-transform:none;letter-spacing:0;color:#555">(optional)</span></label>
+          <textarea id="f-desc" rows="3" placeholder="Short description of the project…"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="form-cancel-btn">Cancel</button>
+        <button class="btn-primary" id="form-save-btn"><i class="bi bi-check-lg"></i> Save Video</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+     DELETE CONFIRM MODAL
+════════════════════════════════════════════════════════ -->
+  <div class="modal-backdrop" id="confirm-modal">
+    <div class="confirm-box">
+      <div class="icon"><i class="bi bi-trash3-fill"></i></div>
+      <h3>Delete Video?</h3>
+      <p>This will permanently remove the video from your portfolio. This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn-cancel" id="confirm-cancel-btn" style="flex:1">Cancel</button>
+        <button class="btn-confirm-delete" id="confirm-delete-btn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ── Constants ──────────────────────────────────────────
+      const PASSWORD = 'rohit2025';
+      const LS_AUTH = 'admin_auth_rohit';
+      const LS_VIDEOS = 'portfolio_videos';
+
+      const SEED_LONG = [
+        { id: uid(), type: 'long', title: 'Project 1', youtubeId: '1Yj80vtI97Q', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'long', title: 'Project 2', youtubeId: '9j_b0VbPDOY', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'long', title: 'Project 3', youtubeId: 'Yg5PuOR4Alk', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'long', title: 'Project 4', youtubeId: 'SgQohJ0Lqfw', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'long', title: 'Project 5', youtubeId: 'zcr-xLVKU8I', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'long', title: 'Project 6', youtubeId: 'HLtdvIg_wWo', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'long', title: 'Project 7', youtubeId: 'cxMQMqzvALY', description: '', createdAt: new Date().toISOString() },
+      ];
+      const SEED_SHORTS = [
+        { id: uid(), type: 'short', title: 'Short 1', youtubeId: '45CQ2tHeBYY', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'short', title: 'Short 2', youtubeId: 'lqhDXJiUbBA', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'short', title: 'Short 3', youtubeId: 'XO8-QAc_mxE', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'short', title: 'Short 4', youtubeId: '3N0wOA7ffSM', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'short', title: 'Short 5', youtubeId: 'Wcsalzd5y78', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'short', title: 'Short 6', youtubeId: 'ySm_Cj2iLVs', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'short', title: 'Short 7', youtubeId: 'zsQVjWfUidI', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'short', title: 'Short 8', youtubeId: 'v5VNUACuJw4', description: '', createdAt: new Date().toISOString() },
+        { id: uid(), type: 'short', title: 'Short 9', youtubeId: '_wq3_6-r3Og', description: '', createdAt: new Date().toISOString() },
+      ];
+
+      // ── Helpers ───────────────────────────────────────────
+      function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+      function getVideos() {
+        try { return JSON.parse(localStorage.getItem(LS_VIDEOS)) || []; }
+        catch { return []; }
+      }
+      function saveVideos(arr) { localStorage.setItem(LS_VIDEOS, JSON.stringify(arr)); }
+
+      function thumbUrl(ytId) { return 'https://img.youtube.com/vi/' + ytId + '/mqdefault.jpg'; }
+
+      // ── Seed ──────────────────────────────────────────────
+      if (!localStorage.getItem(LS_VIDEOS)) {
+        saveVideos([...SEED_LONG, ...SEED_SHORTS]);
+      }
+
+      // ── State ─────────────────────────────────────────────
+      let activeTab = 'long';
+      let pendingDeleteId = null;
+
+      // ── DOM refs ─────────────────────────────────────────
+      const dashboard = document.getElementById('dashboard');
+      const sidebarTabs = document.querySelectorAll('.sidebar-tab');
+      const videoGrid = document.getElementById('video-grid');
+      const longCount = document.getElementById('long-count');
+      const shortCount = document.getElementById('short-count');
+      const sectionTitle = document.getElementById('section-title');
+      const addBtn = document.getElementById('add-btn');
+      const formModal = document.getElementById('form-modal');
+      const modalTitle = document.getElementById('modal-title');
+      const modalCloseBtn = document.getElementById('modal-close-btn');
+      const formCancelBtn = document.getElementById('form-cancel-btn');
+      const formSaveBtn = document.getElementById('form-save-btn');
+      const confirmModal = document.getElementById('confirm-modal');
+      const confirmCancel = document.getElementById('confirm-cancel-btn');
+      const confirmDelete = document.getElementById('confirm-delete-btn');
+      const fTitle = document.getElementById('f-title');
+      const fYtid = document.getElementById('f-ytid');
+      const fType = document.getElementById('f-type');
+      const fDesc = document.getElementById('f-desc');
+      const editId = document.getElementById('edit-id');
+      const thumbPreview = document.getElementById('thumb-preview');
+      const exportBtn = document.getElementById('export-btn');
+      const importBtn = document.getElementById('import-btn');
+      const importInput = document.getElementById('import-input');
+      const sheetBtn = document.getElementById('sheet-btn');
+      const syncNowBtn = document.getElementById('sync-now-btn');
+      const syncSpinner = document.getElementById('sync-spinner');
+      const copySheetBtn = document.getElementById('copy-sheet-btn');
+      const csvBtn = document.getElementById('csv-btn');
+      const syncStatusText = document.getElementById('sync-status-text');
+      const toastCtr = document.getElementById('toast-container');
+
+      // ── Tabs ─────────────────────────────────────────────
+      sidebarTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          activeTab = tab.dataset.tab;
+          sidebarTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          if (activeTab === 'long') {
+            sectionTitle.innerHTML = 'Long <span>Videos</span>';
+          } else {
+            sectionTitle.innerHTML = '<span>Shorts</span>';
+          }
+          renderGrid();
+        });
+      });
+
+      // ── Render ────────────────────────────────────────────
+      function renderGrid() {
+        const videos = getVideos();
+        const filtered = videos.filter(v => v.type === activeTab);
+
+        // Update counts
+        longCount.textContent = videos.filter(v => v.type === 'long').length;
+        shortCount.textContent = videos.filter(v => v.type === 'short').length;
+
+        videoGrid.innerHTML = '';
+
+        if (!filtered.length) {
+          videoGrid.innerHTML = `
+        <div class="empty-state">
+          <div class="icon"><i class="bi bi-camera-video"></i></div>
+          <h3>No ${activeTab === 'long' ? 'long videos' : 'shorts'} yet</h3>
+          <p>Click "+ Add Video" to add your first ${activeTab === 'long' ? 'long video' : 'short'}.</p>
+        </div>`;
+          return;
+        }
+
+        filtered.forEach(video => {
+          const isShort = video.type === 'short';
+          const card = document.createElement('div');
+          card.className = 'video-card';
+          card.innerHTML = `
+        <div class="video-thumb ${isShort ? 'video-thumb-short' : ''}">
+          <img src="${thumbUrl(video.youtubeId)}" alt="${escHtml(video.title)}" loading="lazy" onerror="this.style.opacity='0.3'" />
+          <div class="video-thumb-overlay"><i class="bi bi-play-circle-fill"></i></div>
+        </div>
+        <div class="video-card-body">
+          <h4>${escHtml(video.title)}</h4>
+          <div class="yt-id"><i class="bi bi-youtube"></i>${escHtml(video.youtubeId)}</div>
+          ${video.description ? `<div class="video-card-desc">${escHtml(video.description)}</div>` : ''}
+        </div>
+        <div class="video-card-actions">
+          <button class="btn-edit" data-id="${video.id}"><i class="bi bi-pencil"></i> Edit</button>
+          <button class="btn-delete" data-id="${video.id}"><i class="bi bi-trash3"></i> Delete</button>
+        </div>`;
+          videoGrid.appendChild(card);
+        });
+
+        // Bind card buttons
+        videoGrid.querySelectorAll('.btn-edit').forEach(btn => {
+          btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+        });
+        videoGrid.querySelectorAll('.btn-delete').forEach(btn => {
+          btn.addEventListener('click', () => openConfirm(btn.dataset.id));
+        });
+      }
+
+      function escHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      // ── Add / Edit Modal ─────────────────────────────────
+      addBtn.addEventListener('click', () => openAddModal());
+
+      function openAddModal() {
+        editId.value = '';
+        fTitle.value = '';
+        fYtid.value = '';
+        fType.value = activeTab;
+        fDesc.value = '';
+        modalTitle.textContent = 'Add Video';
+        updateThumbPreview('');
+        openModal(formModal);
+      }
+
+      function openEditModal(id) {
+        const videos = getVideos();
+        const v = videos.find(x => x.id === id);
+        if (!v) return;
+        editId.value = v.id;
+        fTitle.value = v.title;
+        fYtid.value = v.youtubeId;
+        fType.value = v.type;
+        fDesc.value = v.description || '';
+        modalTitle.textContent = 'Edit Video';
+        updateThumbPreview(v.youtubeId, v.type);
+        openModal(formModal);
+      }
+
+      function openModal(el) { el.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      function closeModal(el) { el.classList.remove('open'); document.body.style.overflow = ''; }
+
+      modalCloseBtn.addEventListener('click', () => closeModal(formModal));
+      formCancelBtn.addEventListener('click', () => closeModal(formModal));
+      formModal.addEventListener('click', e => { if (e.target === formModal) closeModal(formModal); });
+
+      // Live preview
+      fYtid.addEventListener('input', () => {
+        updateThumbPreview(fYtid.value.trim(), fType.value);
+      });
+      fType.addEventListener('change', () => {
+        updateThumbPreview(fYtid.value.trim(), fType.value);
+      });
+
+      function updateThumbPreview(ytId, type) {
+        thumbPreview.className = 'thumb-preview' + (type === 'short' ? ' short-preview' : '');
+        if (!ytId) {
+          thumbPreview.innerHTML = '<div class="no-preview"><i class="bi bi-image"></i><span>Thumbnail preview</span></div>';
+          return;
+        }
+        thumbPreview.innerHTML = `<img src="${thumbUrl(ytId)}" alt="Preview" onerror="this.parentElement.innerHTML='<div class=\\'no-preview\\'><i class=\\'bi bi-exclamation-circle\\'></i><span>ID not found</span></div>'" />`;
+      }
+
+      formSaveBtn.addEventListener('click', saveVideo);
+
+      function saveVideo() {
+        const title = fTitle.value.trim();
+        const ytId = fYtid.value.trim();
+        const type = fType.value;
+        const desc = fDesc.value.trim();
+
+        if (!title) { shake(fTitle); showToast('Please enter a title.', 'error'); return; }
+        if (!ytId) { shake(fYtid); showToast('Please enter a YouTube Video ID.', 'error'); return; }
+
+        const videos = getVideos();
+        const id = editId.value;
+
+        if (id) {
+          const idx = videos.findIndex(v => v.id === id);
+          if (idx !== -1) {
+            videos[idx] = { ...videos[idx], title, youtubeId: ytId, type, description: desc };
+            saveVideos(videos);
+            showToast('Video updated!', 'success');
+          }
+        } else {
+          videos.push({ id: uid(), type, title, youtubeId: ytId, description: desc, createdAt: new Date().toISOString() });
+          saveVideos(videos);
+          showToast('Video added!', 'success');
+          // Switch tab to match newly added type
+          if (activeTab !== type) {
+            const tab = document.querySelector(`.sidebar-tab[data-tab="${type}"]`);
+            if (tab) tab.click();
+          }
+        }
+
+        closeModal(formModal);
+        renderGrid();
+      }
+
+      // ── Delete Confirm ───────────────────────────────────
+      function openConfirm(id) {
+        pendingDeleteId = id;
+        openModal(confirmModal);
+      }
+
+      confirmCancel.addEventListener('click', () => closeModal(confirmModal));
+      confirmModal.addEventListener('click', e => { if (e.target === confirmModal) closeModal(confirmModal); });
+
+      confirmDelete.addEventListener('click', () => {
+        if (!pendingDeleteId) return;
+        const videos = getVideos().filter(v => v.id !== pendingDeleteId);
+        saveVideos(videos);
+        closeModal(confirmModal);
+        renderGrid();
+        showToast('Video deleted.', 'success');
+        pendingDeleteId = null;
+      });
+
+      // ── Export / Import ───────────────────────────────────
+      exportBtn.addEventListener('click', () => {
+        const data = getVideos();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'portfolio_videos.json'; a.click();
+        URL.revokeObjectURL(url);
+        showToast('JSON exported!', 'success');
+      });
+
+      importBtn.addEventListener('click', () => importInput.click());
+
+      importInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            if (!Array.isArray(data)) throw new Error('Not an array');
+            saveVideos(data);
+            renderGrid();
+            showToast('Imported ' + data.length + ' videos!', 'success');
+          } catch {
+            showToast('Invalid JSON file.', 'error');
+          }
+          importInput.value = '';
+        };
+        reader.readAsText(file);
+      });
+
+      // ── Google Sheets Sync ─────────────────────────────────
+      const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStxZnzZUjvBQjRIlbroJZWt0zoSE1-AwFVMpvtfToqQhfgzshbWUgIurObpkN3ll-XEiBFSdCjCS9f/pub?gid=0&single=true&output=csv';
+
+      function extractYouTubeId(urlOrId) {
+        if (!urlOrId) return '';
+        const str = String(urlOrId).trim();
+        const match = str.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/) || str.match(/^([\w-]{11})$/);
+        return match ? match[1] : str;
+      }
+
+        function syncGoogleSheet(url, isManual = false) {
+          if (!url) return;
+          if (syncSpinner) syncSpinner.classList.add('spinning');
+          if (isManual) showToast('Connecting to Google Sheet...', 'success');
+          fetch(url)
+            .then(res => res.text())
+            .then(csv => {
+              if (syncSpinner) syncSpinner.classList.remove('spinning');
+              const lines = csv.trim().split(/\r?\n/);
+              if (lines.length > 1) {
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^["']|["']$/g, ''));
+                const list = [];
+                for (let i = 1; i < lines.length; i++) {
+                  if (!lines[i].trim()) continue;
+                  const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/^["']|["']$/g, ''));
+                  const obj = {};
+                  headers.forEach((h, idx) => obj[h] = row[idx] || '');
+                  const raw = obj.youtubelink || obj.youtubeid || obj.link || obj.url || '';
+                  const ytid = extractYouTubeId(raw);
+                  if (ytid) {
+                    list.push({
+                      id: obj.id || ('sheet_' + i),
+                      type: (obj.type || 'long').toLowerCase().trim(),
+                      title: obj.title || 'Project',
+                      youtubeId: ytid,
+                      description: obj.description || '',
+                      createdAt: new Date().toISOString()
+                    });
+                  }
+                }
+                if (list.length > 0) {
+                  saveVideos(list);
+                  renderGrid();
+                  if (syncStatusText) syncStatusText.innerHTML = `Live synced with Google Sheet (${list.length} videos).`;
+                  showToast(`Synced ${list.length} videos from Google Sheet!`, 'success');
+                } else {
+                  if (syncStatusText) syncStatusText.innerHTML = `Google Sheet connected (0 video rows found).`;
+                  if (isManual) showToast('Google Sheet is connected, but no video rows were found. Click "Copy for Sheet" to populate it!', 'error');
+                }
+              } else {
+                if (syncStatusText) syncStatusText.innerHTML = `Google Sheet connected (waiting for rows).`;
+                if (isManual) showToast('Google Sheet has only header row. Click "Copy for Sheet" to populate it!', 'error');
+              }
+            })
+          .catch (err => {
+            if (syncSpinner) syncSpinner.classList.remove('spinning');
+            if (isManual) showToast('Could not fetch Google Sheet CSV. Check internet or link permissions.', 'error');
+          });
+        }
+
+        // ── Sync Action Buttons ────────────────────────────────
+        // 1. Sync Now button
+        if (syncNowBtn) {
+          syncNowBtn.addEventListener('click', () => {
+            const current = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
+            syncGoogleSheet(current, true);
+          });
+        }
+
+        // 2. Copy for Sheet button (Copies table ready to paste into Google Sheet cell A2)
+        if (copySheetBtn) {
+          copySheetBtn.addEventListener('click', () => {
+            const videos = getVideos();
+            if (!videos.length) {
+              showToast('No videos available to copy.', 'error');
+              return;
+            }
+            let tsv = '';
+            videos.forEach((v, idx) => {
+              const isShort = (v.type || '').toLowerCase() === 'short';
+              const ytUrl = isShort
+                ? `https://www.youtube.com/shorts/${v.youtubeId}`
+                : `https://www.youtube.com/watch?v=${v.youtubeId}`;
+              tsv += `${v.id || (idx + 1)}\t${v.type || 'long'}\t${v.title || 'Project'}\t${ytUrl}\t${v.description || ''}\n`;
+            });
+
+            navigator.clipboard.writeText(tsv).then(() => {
+              showToast(`Copied ${videos.length} videos to clipboard! Go to Google Sheet cell A2 and press Ctrl+V.`, 'success');
+            }).catch(() => {
+              const ta = document.createElement('textarea');
+              ta.value = tsv;
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+              showToast(`Copied ${videos.length} videos! Paste (Ctrl+V) in cell A2 of Google Sheet.`, 'success');
+            });
+          });
+        }
+
+        // 3. Download CSV for Google Sheet button
+        if (csvBtn) {
+          csvBtn.addEventListener('click', () => {
+            const videos = getVideos();
+            let csv = 'id,type,title,youtubelink,description\n';
+            videos.forEach((v, idx) => {
+              const isShort = (v.type || '').toLowerCase() === 'short';
+              const ytUrl = isShort
+                ? `https://www.youtube.com/shorts/${v.youtubeId}`
+                : `https://www.youtube.com/watch?v=${v.youtubeId}`;
+              const cleanTitle = (v.title || '').replace(/"/g, '""');
+              const cleanDesc = (v.description || '').replace(/"/g, '""');
+              csv += `${v.id || (idx + 1)},${v.type || 'long'},"${cleanTitle}",${ytUrl},"${cleanDesc}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'portfolio_videos.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('CSV downloaded! In Google Sheet: File > Import > Upload.', 'success');
+          });
+        }
+
+        // 4. Configure Google Sheet URL button
+        if (sheetBtn) {
+          sheetBtn.addEventListener('click', () => {
+            const current = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
+            const input = prompt('Enter your Google Sheet Published CSV URL:\n(Leave empty to disconnect and use local storage)', current);
+            if (input !== null) {
+              const trimmed = input.trim();
+              if (trimmed) {
+                localStorage.setItem('google_sheets_csv_url', trimmed);
+                syncGoogleSheet(trimmed, true);
+              } else {
+                localStorage.removeItem('google_sheets_csv_url');
+                showToast('Google Sheet disconnected. Using local storage.');
+                if (syncStatusText) syncStatusText.textContent = 'Using local browser storage.';
+              }
+            }
+          });
+        }
+
+        // ── Toast ─────────────────────────────────────────────
+        function showToast(msg, type = 'success') {
+          const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill';
+          const t = document.createElement('div');
+          t.className = `toast ${type}`;
+          t.innerHTML = `<i class="bi ${icon}"></i> ${msg}`;
+          toastCtr.appendChild(t);
+          setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; t.style.transition = '0.3s'; setTimeout(() => t.remove(), 300); }, 3000);
+        }
+
+        // ── Shake helper ──────────────────────────────────────
+        function shake(el) {
+          el.classList.add('shake');
+          el.style.borderColor = '#ff4d4d';
+          setTimeout(() => { el.classList.remove('shake'); el.style.borderColor = ''; }, 600);
+        }
+
+        // ── Keyboard shortcuts ────────────────────────────────
+        document.addEventListener('keydown', e => {
+          if (e.key === 'Escape') {
+            closeModal(formModal);
+            closeModal(confirmModal);
+          }
+        });
+
+        // ── Init ──────────────────────────────────────────────
+        renderGrid();
+        const currentSheet = localStorage.getItem("google_sheets_csv_url") || DEFAULT_SHEET_URL;
+        if (currentSheet) syncGoogleSheet(currentSheet);
+
+      }) ();
+  </script>
+</body>
+
+</html>

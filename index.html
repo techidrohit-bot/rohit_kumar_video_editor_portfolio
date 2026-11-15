@@ -1,0 +1,1127 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>My Portfolio - Rohit Kumar</title>
+  <meta name="description" content="Video Editor & Motion Graphics Designer Portfolio" />
+  <meta name="keywords" content="video editing, motion graphics, premiere pro, after effects" />
+
+  <!-- Favicons -->
+  <link href="assets/img/rohit2.jpg" rel="icon" />
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet" />
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet" />
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet" />
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet" />
+
+  <!-- ===== DOCK NAV + SCROLL PROGRESS STYLES ===== -->
+  <style>
+    /* ---- Scroll Progress SVG ---- */
+    #scroll-progress-svg {
+      position: fixed;
+      top: 0;
+      left: 20px;
+      width: 60px;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+    #scroll-track { stroke: rgba(180,120,255,0.15); }
+    #scroll-fill  { stroke: rgba(180,120,255,0.55); filter: url(#glow); }
+
+    /* ---- Apple Crystal Glass Dock Nav ---- */
+    #dock-nav {
+      position: fixed;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-top: 1px solid rgba(255, 255, 255, 0.65);
+      border-radius: 999px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35),
+                  0 0 0 1px rgba(255, 255, 255, 0.12),
+                  inset 0 1.5px 2px rgba(255, 255, 255, 0.4),
+                  inset 0 -1.5px 2px rgba(255, 255, 255, 0.08);
+    }
+    /* Subtle glass connecting track like in reference image */
+    #dock-nav::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 24px;
+      right: 24px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .dock-btn {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 18px;
+      text-decoration: none;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  color 0.2s ease,
+                  background 0.25s ease,
+                  box-shadow 0.25s ease,
+                  border-color 0.25s ease;
+      outline: none;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    }
+    .dock-btn:hover {
+      transform: scale(1.18);
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    }
+    .dock-btn.dock-active {
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.8),
+                  0 4px 14px rgba(124, 58, 237, 0.5),
+                  inset 0 1.5px 2px rgba(255, 255, 255, 0.6);
+    }
+    /* Tooltip */
+    .dock-btn::after {
+      content: attr(data-label);
+      position: absolute;
+      bottom: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: rgba(20, 20, 25, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: #ffffff;
+      font-size: 11px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .dock-btn:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Mobile compact */
+    @media (max-width: 767px) {
+      #dock-nav {
+        bottom: 16px;
+        gap: 6px;
+        padding: 6px 10px;
+      }
+      .dock-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
+      }
+    }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .dock-btn,
+      .dock-btn::after,
+      #scroll-fill {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+  <!-- ===== END DOCK NAV + SCROLL PROGRESS STYLES ===== -->
+</head>
+
+<body class="index-page">
+
+  <!-- ===== SCROLL PROGRESS SVG ===== -->
+  <svg id="scroll-progress-svg" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="glow" x="-50%" y="-10%" width="200%" height="120%">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <!-- track path (always visible, faint) -->
+    <path id="scroll-track" fill="none" stroke-width="2" stroke-linecap="round"/>
+    <!-- progress fill path -->
+    <path id="scroll-fill"  fill="none" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+  <!-- ===== END SCROLL PROGRESS SVG ===== -->
+
+  <header id="header" class="header dark-background d-flex flex-column justify-content-center">
+    <i class="header-toggle d-xl-none bi bi-list"></i>
+
+    <div class="header-container d-flex flex-column align-items-start">
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li>
+            <a href="#hero" class="active"><i class="bi bi-house navicon"></i>Home</a>
+          </li>
+          <li>
+            <a href="#about"><i class="bi bi-person navicon"></i> About</a>
+          </li>
+          <li>
+            <a href="#experience"><i class="bi bi-briefcase navicon"></i> Experience</a>
+          </li>
+          <li>
+            <a href="#portfolio"><i class="bi bi-file-earmark navicon"></i> Portfolio</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="social-links text-center">
+        <a href="https://www.instagram.com/i_amrohit.7?igsh=MXEycXpyOHYzM2xw&utm_source=qr" class="instagram"><i
+            class="bi bi-instagram"></i></a>
+        <a href="https://www.linkedin.com/in/rohit-kumar-368190264?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+          class="linkedin"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Hero Section -->
+    <section id="hero" class="hero section">
+      <div class="background-elements">
+        <div class="bg-circle circle-1"></div>
+        <div class="bg-circle circle-2"></div>
+      </div>
+
+      <div class="hero-content">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right" data-aos-delay="100">
+              <div class="hero-text">
+                <h1>He<span class="accent-text">llo!</span></h1>
+                <h2>I am Rohit Kumar</h2>
+                <p class="lead">
+                  A
+                  <span class="typed" data-typed-items="Video Editor, Motion Graphics"></span>
+                </p>
+                <p class="description">
+                  Passionate about creating impactful visuals and engaging
+                  motion graphics that tell compelling stories. Let's create
+                  something amazing together.
+                </p>
+
+                <div class="hero-actions">
+                  <a href="#portfolio" class="btn btn-primary">View My Work</a>
+                  <a href="#about" class="btn btn-outline">Get In Touch</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+              <div class="hero-visual">
+                <div class="profile-container">
+                  <div class="profile-background"></div>
+                  <img src="assets/img/profile/rohit1.jpg" alt="Rohit Kumar" class="profile-image" />
+                  <div class="floating-elements">
+                    <div class="floating-icon icon-1">
+                      <i class="bi bi-camera-video"></i>
+                    </div>
+                    <div class="floating-icon icon-2">
+                      <i class="bi bi-play-btn"></i>
+                    </div>
+                    <div class="floating-icon icon-3">
+                      <i class="bi bi-lightbulb"></i>
+                    </div>
+                    <div class="floating-icon icon-4">
+                      <i class="bi bi-palette"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /Hero Section -->
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row">
+          <div class="col-lg-5" data-aos="zoom-in" data-aos-delay="200">
+            <div class="profile-card">
+              <div class="profile-header">
+                <div class="profile-image">
+                  <img src="assets/img/profile/rohit1.jpg" alt="Profile Image" class="img-fluid" />
+                </div>
+                <div class="profile-badge">
+                  <i class="bi bi-check-circle-fill"></i>
+                </div>
+              </div>
+
+              <div class="profile-content">
+                <h3>Rohit Kumar</h3>
+                <p class="profession">Video Editor & Motion Graphics</p>
+
+                <div class="contact-links">
+                  <a href="mailto:iamrohitkumar509@gmail.com" class="contact-item">
+                    <i class="bi bi-envelope"></i>
+                    iamrohitkumar509@gmail.com
+                  </a>
+                  <a href="tel:+916393217519" class="contact-item">
+                    <i class="bi bi-telephone"></i>
+                    +91 6393217519
+                  </a>
+                  <a href="#" class="contact-item">
+                    <i class="bi bi-geo-alt"></i>
+                    Noida, Uttar Pradesh
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7" data-aos="fade-left" data-aos-delay="300">
+            <div class="about-content">
+              <div class="section-header">
+                <span class="badge-text">Get to Know Me</span>
+                <h2>Passionate about creating video content</h2>
+              </div>
+
+              <div class="description">
+                <p>
+                  I'm Rohit Kumar, a Video Editor & Motion Graphics with 2
+                  years of experience.Creative and detail-oriented Video
+                  Editor with Motion Graphics skills and 2 years of experience
+                  in editing ads, storytelling videos, testimonials,
+                  documentaries, podcasts, and AI content. Skilled in
+                  producing engaging, high-quality videos that help brands
+                  connect with their audience and communicate their message in
+                  a clear and creative way.
+                </p>
+              </div>
+
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <div class="stat-number">20+</div>
+                  <div class="stat-label">Projects Completed</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">2+</div>
+                  <div class="stat-label">Years Experience</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">15+</div>
+                  <div class="stat-label">Happy Clients</div>
+                </div>
+              </div>
+
+              <div class="details-grid">
+                <div class="detail-row">
+                  <div class="detail-item">
+                    <span class="detail-label">Specialization</span>
+                    <span class="detail-value">Video Editing & Motion Graphics</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Experience Level</span>
+                    <span class="detail-value"> Professional</span>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <div class="detail-item">
+                    <span class="detail-label">Education</span>
+                    <span class="detail-value">Bachelor of Arts</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Languages</span>
+                    <span class="detail-value">English, Hindi</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cta-section">
+                <a href="https://drive.google.com/drive/folders/1IumA0gnAgOB6-SpY-6JMV62z9mzEyqUe?usp=drive_link"
+                  class="btn btn-primary">
+                  <i class="bi bi-download"></i>
+                  Download Resume
+                </a>
+                <a href="#about" class="btn btn-outline">
+                  <i class="bi bi-chat-dots"></i>
+                  Let's Talk
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /About Section -->
+
+    <!-- Experience Section -->
+    <section id="experience" class="experience section light-background">
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Experience</h2>
+        <p>My professional journey and expertise</p>
+      </div>
+      <!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="experience-content">
+              <div class="experience-intro">
+                <p>
+                  With 2 years of professional experience, I have worked on
+                  advertisements, political campaigns, social media content,
+                  storytelling projects, and explainer videos. I specialize in
+                  transforming ideas into engaging visuals and motion graphics
+                  that connect with the audience and deliver results.
+                </p>
+              </div>
+
+              <div class="timeline">
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="150">
+                  <div class="timeline-date">Feb 2025 – March 2026</div>
+                  <div class="timeline-content">
+                    <h3>Video Editor & Motion Graphics</h3>
+                    <h4>Inquisitive Digital</h4>
+                    <ul>
+                      <li>
+                        Produced and edited high-performing ad campaigns,
+                        testimonials, and documentary-style videos that
+                        boosted client engagement and brand credibility.
+                      </li>
+                      <li>
+                        Designed and animated motion graphics and explainer
+                        videos, simplifying complex ideas into engaging
+                        visuals.
+                      </li>
+                      <li>
+                        Collaborated with marketing and creative teams to
+                        build story-driven, premium-quality video content
+                        tailored for diverse digital platforms.
+                      </li>
+                      <li>
+                        Delivered aesthetic and impactful edits that enhanced
+                        audience retention and improved campaign performance.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="150">
+                  <div class="timeline-date">July 2024 - Oct 2024</div>
+                  <div class="timeline-content">
+                    <h3>Video Editor</h3>
+                    <h4>Office of the MLA Badshahpur (Gurgaon)</h4>
+                    <ul>
+                      <li>
+                        Edited Political videos using Adobe Premiere Pro and
+                        After Effects
+                      </li>
+                      <li>
+                        Created engaging reels, supportive videos, songs, and
+                        documentaries
+                      </li>
+                      <li>Produced 2 reels daily with consistent quality</li>
+                      <li>
+                        Implemented camera mapping and parallax effects to
+                        convert static images into dynamic 3D animations
+                      </li>
+                      <li>
+                        Used advanced masking and roto-scoping techniques for
+                        precise object isolation
+                      </li>
+                      <li>
+                        Collaborated with team to discuss innovative video
+                        ideas
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="200">
+                  <div class="timeline-date">March 2023 - June 2024</div>
+                  <div class="timeline-content">
+                    <h3>Video Editor</h3>
+                    <h4>Ramji Studios</h4>
+                    <ul>
+                      <li>
+                        Edited Wedding videos using Adobe Premiere Pro, After
+                        Effects and Photoshop
+                      </li>
+                      <li>
+                        Implemented color correction, audio adjustments, and
+                        other post-production processes to enhance video
+                        quality
+                      </li>
+                      <li>
+                        Managed and organized raw footage and edited sequences
+                        effectively
+                      </li>
+                      <li>
+                        Contributed creative ideas and solutions to enhance
+                        the storytelling aspect of each video
+                      </li>
+                      <li>
+                        Collaborated closely with clients to understand their
+                        preferences and vision for the final product
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="skills-section">
+                <h3>Technical Skills</h3>
+                <div class="skills-grid">
+                  <div class="skill-category">
+                    <h4>Video Editing</h4>
+                    <div class="skill-list">
+                      <span class="skill-tag">Adobe Premiere Pro</span>
+                      <!-- <span class="skill-tag">Final Cut Pro</span> -->
+                      <span class="skill-tag">DaVinci Resolve</span>
+                    </div>
+                  </div>
+
+                  <div class="skill-category">
+                    <h4>Motion Graphics</h4>
+                    <div class="skill-list">
+                      <span class="skill-tag">Adobe After Effects</span>
+                      <!-- <span class="skill-tag">Animation</span> -->
+                      <span class="skill-tag">Visual Effects</span>
+                    </div>
+                  </div>
+
+                  <div class="skill-category">
+                    <h4>Graphic Design</h4>
+                    <div class="skill-list">
+                      <span class="skill-tag">Adobe Photoshop</span>
+                      <!-- <span class="skill-tag">Illustrator</span> -->
+                      <span class="skill-tag">Typography</span>
+                    </div>
+                  </div>
+
+                  <div class="skill-category">
+                    <h4>Specializations</h4>
+                    <div class="skill-list">
+                      <span class="skill-tag">AI Videos</span>
+                      <span class="skill-tag">Color Grading</span>
+                      <span class="skill-tag">Audio Sync</span>
+                      <span class="skill-tag">Storytelling</span>
+                      <span class="skill-tag">Documentary Editing</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /Experience Section -->
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio section">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Portfolio</h2>
+        <p>Explore highlighted projects I've worked on.</p>
+      </div>
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="isotope-layout" data-default-filter=".filter-long_video" data-layout="masonry"
+          data-sort="original-order">
+          <div class="row">
+            <div class="col-lg-3 filter-sidebar">
+              <div class="filters-wrapper" data-aos="fade-right" data-aos-delay="150">
+                <ul class="portfolio-filters isotope-filters">
+                  <li data-filter=".filter-long_video" class="filter-active">
+                    Long Videos
+                  </li>
+                  <li data-filter=".filter-shorts">Shorts</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="col-lg-9">
+              <div class="row gy-4 portfolio-container isotope-container" data-aos="fade-up" data-aos-delay="200">
+                <div class="col-lg-6 col-md-6 portfolio-item isotope-item filter-long_video">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-16x9">
+                      <iframe src="https://www.youtube.com/embed/1Yj80vtI97Q?si=tQU2Fhe1YQ-G1a4I"
+                        allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Long Videos</span>
+                        <h4>Project 1</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6 portfolio-item isotope-item filter-long_video">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-16x9">
+                      <iframe src="https://www.youtube.com/embed/9j_b0VbPDOY?si=-sgomO6U-n8ANDAh"
+                        allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Long Videos</span>
+                        <h4>Project 2</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6 portfolio-item isotope-item filter-long_video">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-16x9">
+                      <iframe src="https://www.youtube.com/embed/Yg5PuOR4Alk?si=hsMoSKMmnv0KhHcx"
+                        allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Long Videos</span>
+                        <h4>Project 3</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6 portfolio-item isotope-item filter-long_video">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-16x9">
+                      <iframe src="https://www.youtube.com/embed/SgQohJ0Lqfw?si=dClRCmawI4o7KGWT"
+                        allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Long Videos</span>
+                        <h4>Project 4</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6 portfolio-item isotope-item filter-long_video">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-16x9">
+                      <iframe src="https://www.youtube.com/embed/zcr-xLVKU8I?si=fZP_VwsK4YUdkSK1"
+                        allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Long Videos</span>
+                        <h4>Project 5</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6 portfolio-item isotope-item filter-long_video">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-16x9">
+                      <iframe src="https://www.youtube.com/embed/HLtdvIg_wWo?si=-wms6i73TOkSSLGH"
+                        allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Long Videos</span>
+                        <h4>Project 6</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6 portfolio-item isotope-item filter-long_video">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-16x9">
+                      <iframe src="https://www.youtube.com/embed/cxMQMqzvALY?si=2pGOlOFEvWShiOkk"
+                        allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Long Videos</span>
+                        <h4>Project 7</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+
+                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-shorts">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-9x16">
+                      <iframe src="https://www.youtube.com/embed/45CQ2tHeBYY" allow="autoplay; encrypted-media"
+                        allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Shorts</span>
+                        <h4>Short 1</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-shorts">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-9x16">
+                      <iframe src="https://www.youtube.com/embed/lqhDXJiUbBA" allow="autoplay; encrypted-media"
+                        allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Shorts</span>
+                        <h4>Short 2</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-shorts">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-9x16">
+                      <iframe src="https://www.youtube.com/embed/XO8-QAc_mxE" allow="autoplay; encrypted-media"
+                        allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Shorts</span>
+                        <h4>Short 3</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-shorts">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-9x16">
+                      <iframe src="https://www.youtube.com/embed/3N0wOA7ffSM" allow="autoplay; encrypted-media"
+                        allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Shorts</span>
+                        <h4>Short 4</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-shorts">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-9x16">
+                      <iframe src="https://www.youtube.com/embed/Wcsalzd5y78" allow="autoplay; encrypted-media"
+                        allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Shorts</span>
+                        <h4>Short 5</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-shorts">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-9x16">
+                      <iframe src="https://www.youtube.com/embed/ySm_Cj2iLVs" allow="autoplay; encrypted-media"
+                        allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Shorts</span>
+                        <h4>Short 6</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-shorts">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-9x16">
+                      <iframe src="https://www.youtube.com/embed/zsQVjWfUidI" allow="autoplay; encrypted-media"
+                        allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Shorts</span>
+                        <h4>Short 7</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-shorts">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-9x16">
+                      <iframe src="https://www.youtube.com/embed/v5VNUACuJw4" allow="autoplay; encrypted-media"
+                        allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Shorts</span>
+                        <h4>Short 8</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-shorts">
+                  <div class="portfolio-wrap bg-black">
+                    <div class="ratio ratio-9x16">
+                      <iframe src="https://www.youtube.com/embed/_wq3_6-r3Og" allow="autoplay; encrypted-media"
+                        allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="portfolio-info">
+                      <div class="content">
+                        <span class="category">Shorts</span>
+                        <h4>Short 9</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="footer" class="footer position-relative">
+    <div class="container">
+      <div class="copyright text-center">
+        &copy; Copyright <strong><span>Rohit Kumar</span></strong>. All Rights Reserved
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/typed.js/typed.umd.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+  <!-- ===== DOCK NAV HTML ===== -->
+  <nav id="dock-nav" role="navigation" aria-label="Quick navigation">
+    <a href="#hero"     class="dock-btn dock-active" data-section="hero"       data-label="Home"       aria-label="Home"><i class="bi bi-house-fill"></i></a>
+    <a href="#about"    class="dock-btn"              data-section="about"      data-label="About"      aria-label="About"><i class="bi bi-person-fill"></i></a>
+    <a href="#experience" class="dock-btn"            data-section="experience" data-label="Experience" aria-label="Experience"><i class="bi bi-briefcase-fill"></i></a>
+    <a href="#portfolio" class="dock-btn"             data-section="portfolio"  data-label="Portfolio"  aria-label="Portfolio"><i class="bi bi-play-btn-fill"></i></a>
+    <a href="admin.html" class="dock-btn"             data-label="Admin"        aria-label="Admin"><i class="bi bi-shield-lock-fill"></i></a>
+  </nav>
+  <!-- ===== END DOCK NAV HTML ===== -->
+
+  <!-- ===== DOCK NAV + SCROLL PROGRESS JS ===== -->
+  <script>
+  (function () {
+    /* ---- Scroll Progress ---- */
+    const svg    = document.getElementById('scroll-progress-svg');
+    const track  = document.getElementById('scroll-track');
+    const fill   = document.getElementById('scroll-fill');
+
+    const W = 60;   // svg viewport width
+    const AMP = 18; // horizontal undulation amplitude
+    const CX = W / 2; // center x
+
+    function buildPath(h) {
+      // Sinusoidal path: M cx,0 C ... down to cx,h
+      // We'll use a series of cubic bezier curves
+      const freq = 0.012; // cycles per pixel
+      const segments = Math.ceil(h / 60);
+      const step = h / segments;
+      let d = `M ${CX} 0`;
+      for (let i = 0; i < segments; i++) {
+        const y0 = i * step;
+        const y1 = (i + 1) * step;
+        const cp1x = CX + AMP * Math.sin(freq * 2 * Math.PI * (y0 + step * 0.33));
+        const cp1y = y0 + step * 0.33;
+        const cp2x = CX + AMP * Math.sin(freq * 2 * Math.PI * (y0 + step * 0.66));
+        const cp2y = y0 + step * 0.66;
+        const ex   = CX + AMP * Math.sin(freq * 2 * Math.PI * y1);
+        d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${ex.toFixed(1)},${y1.toFixed(1)}`;
+      }
+      return d;
+    }
+
+    let pathLength = 0;
+    let currentH = 0;
+
+    function setupPath() {
+      const h = window.innerHeight;
+      if (h === currentH) return;
+      currentH = h;
+      const d = buildPath(h);
+      track.setAttribute('d', d);
+      fill.setAttribute('d', d);
+      pathLength = fill.getTotalLength ? fill.getTotalLength() : h;
+      track.style.strokeDasharray  = pathLength;
+      track.style.strokeDashoffset = 0;
+      fill.style.strokeDasharray   = pathLength;
+      fill.style.strokeDashoffset  = pathLength; // start fully hidden
+    }
+
+    let rafId = null;
+    let targetOffset = null;
+
+    function updateProgress() {
+      const scrollable = document.body.scrollHeight - window.innerHeight;
+      const ratio = scrollable > 0 ? window.scrollY / scrollable : 0;
+      targetOffset = pathLength * (1 - ratio);
+      if (rafId === null) {
+        rafId = requestAnimationFrame(draw);
+      }
+    }
+
+    function draw() {
+      rafId = null;
+      if (targetOffset !== null) {
+        fill.style.strokeDashoffset = targetOffset;
+      }
+    }
+
+    window.addEventListener('resize', () => { setupPath(); updateProgress(); }, { passive: true });
+    window.addEventListener('scroll', updateProgress, { passive: true });
+
+    // Init after DOM is ready
+    setupPath();
+    updateProgress();
+
+    /* ---- Dock Nav Active State ---- */
+    const dockBtns = document.querySelectorAll('#dock-nav .dock-btn[data-section]');
+    const sections = Array.from(dockBtns).map(b => document.getElementById(b.dataset.section)).filter(Boolean);
+
+    function setActive(id) {
+      dockBtns.forEach(b => {
+        b.classList.toggle('dock-active', b.dataset.section === id);
+      });
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) setActive(entry.target.id);
+      });
+    }, { threshold: 0.35 });
+
+    sections.forEach(s => observer.observe(s));
+
+    // Smooth scroll for anchor buttons
+    dockBtns.forEach(btn => {
+      if (btn.getAttribute('href') && btn.getAttribute('href').startsWith('#')) {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          const target = document.querySelector(btn.getAttribute('href'));
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+    });
+  })();
+  </script>
+  <!-- ===== END DOCK NAV + SCROLL PROGRESS JS ===== -->
+
+  <!-- ===== DYNAMIC CMS PORTFOLIO LOADER (LocalStorage + Google Sheets) ===== -->
+  <script>
+  (function () {
+    const container = document.querySelector('.portfolio-container');
+    if (!container) return;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStxZnzZUjvBQjRIlbroJZWt0zoSE1-AwFVMpvtfToqQhfgzshbWUgIurObpkN3ll-XEiBFSdCjCS9f/pub?gid=0&single=true&output=csv';
+
+    function extractYouTubeId(urlOrId) {
+      if (!urlOrId) return '';
+      const str = String(urlOrId).trim();
+      const match = str.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/) || str.match(/^([\w-]{11})$/);
+      return match ? match[1] : str;
+    }
+
+    function renderVideos(videos) {
+      if (!Array.isArray(videos) || videos.length === 0) return;
+
+      let html = '';
+      videos.forEach(v => {
+        const isLong = (v.type || '').toLowerCase() !== 'short';
+        const colClass = isLong ? 'col-lg-6 col-md-6 filter-long_video' : 'col-lg-4 col-md-6 filter-shorts';
+        const ratioClass = isLong ? 'ratio-16x9' : 'ratio-9x16';
+        const category = isLong ? 'Long Videos' : 'Shorts';
+
+        const ytid = extractYouTubeId(v.youtubeId || v.youtubelink || '');
+        if (!ytid) return;
+
+        html += `
+        <div class="${colClass} portfolio-item isotope-item">
+          <div class="portfolio-wrap bg-black">
+            <div class="ratio ${ratioClass}">
+              <iframe
+                src="https://www.youtube.com/embed/${ytid}"
+                allow="autoplay; encrypted-media"
+                allowfullscreen
+                loading="lazy">
+              </iframe>
+            </div>
+            <div class="portfolio-info">
+              <div class="content">
+                <span class="category">${category}</span>
+                <h4>${escapeHtml(v.title || 'Untitled Project')}</h4>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      });
+
+      if (!html) return;
+      container.innerHTML = html;
+
+      // Re-layout Isotope if present
+      setTimeout(() => {
+        if (typeof imagesLoaded !== 'undefined' && typeof Isotope !== 'undefined') {
+          imagesLoaded(container, function () {
+            const iso = Isotope.data(container);
+            if (iso) {
+              iso.reloadItems();
+              iso.arrange();
+            } else {
+              new Isotope(container, {
+                itemSelector: '.isotope-item',
+                layoutMode: 'masonry',
+                filter: '.filter-long_video'
+              });
+            }
+          });
+        }
+      }, 60);
+    }
+
+    // Parse Google Sheet CSV format: id,type,title,youtubelink,description
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      if (lines.length < 2) return [];
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^["']|["']$/g, ''));
+      const list = [];
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/^["']|["']$/g, ''));
+        const obj = {};
+        headers.forEach((h, idx) => {
+          obj[h] = row[idx] || '';
+        });
+        const rawLink = obj.youtubelink || obj.youtubeid || obj.link || obj.url || '';
+        const ytid = extractYouTubeId(rawLink);
+        if (ytid) {
+          list.push({
+            id: obj.id || ('sheet_' + i),
+            type: (obj.type || 'long').toLowerCase().trim(),
+            title: obj.title || 'Project',
+            youtubeId: ytid,
+            description: obj.description || ''
+          });
+        }
+      }
+      return list;
+    }
+
+    // 1. Fetch live Google Sheet
+    const sheetUrl = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
+    if (sheetUrl) {
+      fetch(sheetUrl)
+        .then(res => res.text())
+        .then(csvText => {
+          const videosFromSheet = parseCSV(csvText);
+          if (videosFromSheet.length > 0) {
+            renderVideos(videosFromSheet);
+            localStorage.setItem('portfolio_videos', JSON.stringify(videosFromSheet));
+          } else {
+            loadFromLocal();
+          }
+        })
+        .catch(err => {
+          console.warn('Google Sheets fetch failed, falling back to local storage:', err);
+          loadFromLocal();
+        });
+    } else {
+      loadFromLocal();
+    }
+
+    function loadFromLocal() {
+      const localData = localStorage.getItem('portfolio_videos');
+      if (localData) {
+        try {
+          const parsed = JSON.parse(localData);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            renderVideos(parsed);
+          }
+        } catch (e) {
+          console.error('Failed to parse portfolio_videos from localStorage', e);
+        }
+      }
+    }
+  })();
+  </script>
+</body>
+
+</html>

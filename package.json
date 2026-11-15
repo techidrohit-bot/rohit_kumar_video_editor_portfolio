@@ -1,0 +1,11 @@
+{
+  "name": "rohitportfolio",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "dependencies": {
+    "bootstrap-icons": "^1.13.1"
+  }
+}
+
