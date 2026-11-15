@@ -262,10 +262,10 @@
               </div>
 
               <div class="cta-section">
-                  href="assets/pdf/rohit_kumar_resume.pdf" download="Rohit_Kumar_Resume.pdf" target="_blank"
-                  class="btn btn-primary">
-                  <i class="bi bi-download"></i>
-                  Download Resume
+                href="assets/pdf/rohit_kumar_resume.pdf" download="Rohit_Kumar_Resume.pdf" target="_blank"
+                class="btn btn-primary">
+                <i class="bi bi-download"></i>
+                Download Resume
                 </a>
                 <a href="#about" class="btn btn-outline">
                   <i class="bi bi-chat-dots"></i>
@@ -772,20 +772,6 @@
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
 
-  <!-- ===== DOCK NAV HTML ===== -->
-  <nav id="dock-nav" role="navigation" aria-label="Quick navigation">
-    <a href="#hero" class="dock-btn dock-active" data-section="hero" data-label="Home" aria-label="Home"><i
-        class="bi bi-house-fill"></i></a>
-    <a href="#about" class="dock-btn" data-section="about" data-label="About" aria-label="About"><i
-        class="bi bi-person-fill"></i></a>
-    <a href="#experience" class="dock-btn" data-section="experience" data-label="Experience" aria-label="Experience"><i
-        class="bi bi-briefcase-fill"></i></a>
-    <a href="#portfolio" class="dock-btn" data-section="portfolio" data-label="Portfolio" aria-label="Portfolio"><i
-        class="bi bi-play-btn-fill"></i></a>
-    <a href="admin.html" class="dock-btn" data-label="Admin" aria-label="Admin"><i
-        class="bi bi-shield-lock-fill"></i></a>
-  </nav>
-  <!-- ===== END DOCK NAV HTML ===== -->
 
   <!-- ===== DOCK NAV + SCROLL PROGRESS JS ===== -->
   <script>
@@ -861,38 +847,9 @@
       // Init after DOM is ready
       setupPath();
       updateProgress();
-
-      /* ---- Dock Nav Active State ---- */
-      const dockBtns = document.querySelectorAll('#dock-nav .dock-btn[data-section]');
-      const sections = Array.from(dockBtns).map(b => document.getElementById(b.dataset.section)).filter(Boolean);
-
-      function setActive(id) {
-        dockBtns.forEach(b => {
-          b.classList.toggle('dock-active', b.dataset.section === id);
-        });
-      }
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        });
-      }, { threshold: 0.35 });
-
-      sections.forEach(s => observer.observe(s));
-
-      // Smooth scroll for anchor buttons
-      dockBtns.forEach(btn => {
-        if (btn.getAttribute('href') && btn.getAttribute('href').startsWith('#')) {
-          btn.addEventListener('click', e => {
-            e.preventDefault();
-            const target = document.querySelector(btn.getAttribute('href'));
-            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          });
-        }
-      });
     })();
   </script>
-  <!-- ===== END DOCK NAV + SCROLL PROGRESS JS ===== -->
+  <!-- ===== END SCROLL PROGRESS JS ===== -->
 
   <!-- ===== DYNAMIC CMS PORTFOLIO LOADER (LocalStorage + Google Sheets) ===== -->
   <script>
