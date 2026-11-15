@@ -1064,6 +1064,10 @@
           id="sync-status-text">Google Sheet connected. Click <strong>Sync from Sheet</strong> to pull live
           changes.</span></p>
       <div class="sync-actions">
+        <button class="btn-sm" id="push-sheet-btn"
+          style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; font-weight: 700;"
+          title="Push all current videos directly to Google Sheet"><i class="bi bi-cloud-arrow-up-fill"
+            id="push-spinner"></i> Push to Sheet</button>
         <button class="btn-sm accent" id="sync-now-btn" title="Fetch latest videos from Google Sheet"><i
             class="bi bi-arrow-repeat" id="sync-spinner"></i> Sync from Sheet</button>
         <button class="btn-sm" id="copy-sheet-btn" title="Copy videos formatted for Google Sheet (Ctrl+V into Row 2)"><i
@@ -1173,6 +1177,52 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════
+     GOOGLE APPS SCRIPT WEB APP MODAL
+════════════════════════════════════════════════════════ -->
+  <div class="modal-backdrop" id="apps-script-modal">
+    <div class="modal-box" style="max-width: 620px;">
+      <div class="modal-header">
+        <h3><i class="bi bi-lightning-charge-fill" style="color: #10b981;"></i> Connect Direct Google Sheet Push</h3>
+        <button class="modal-close" id="apps-script-close-btn"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+          To allow <strong>"Push to Sheet"</strong> to automatically write videos to your Google Sheet without manual
+          copy-paste, connect a free Google Apps Script:
+        </p>
+        <ol style="font-size: 13px; color: #ddd; margin-left: 20px; margin-bottom: 14px; line-height: 1.7;">
+          <li>In your Google Sheet, open menu: <strong>Extensions &gt; Apps Script</strong>.</li>
+          <li>Paste the script below into the editor:</li>
+        </ol>
+        <div style="position: relative; margin-bottom: 14px;">
+          <textarea id="apps-script-code" readonly
+            style="width: 100%; height: 110px; font-family: monospace; font-size: 11px; background: #000; color: #4dff91; border: 1px solid var(--border); border-radius: 8px; padding: 10px; resize: none;"></textarea>
+          <button id="copy-apps-script-btn" class="btn-sm"
+            style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.18); color: #fff;"><i
+              class="bi bi-clipboard"></i> Copy Code</button>
+        </div>
+        <ol start="3" style="font-size: 13px; color: #ddd; margin-left: 20px; margin-bottom: 14px; line-height: 1.7;">
+          <li>Click blue <strong>Deploy &gt; New deployment</strong> &gt; Select type: <strong>Web app</strong>.</li>
+          <li>Set <em>"Who has access"</em> to <strong>Anyone</strong>, click <strong>Deploy</strong>, and copy the Web
+            app URL.</li>
+          <li>Paste that Web app URL below:</li>
+        </ol>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label>Google Apps Script Web App URL</label>
+          <input type="url" id="apps-script-url-input" placeholder="https://script.google.com/macros/s/.../exec" />
+        </div>
+      </div>
+      <div class="modal-footer"
+        style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn-cancel" id="apps-script-cancel-btn">Cancel</button>
+        <button class="btn-primary" id="apps-script-save-btn"
+          style="background: linear-gradient(135deg, #10b981, #059669); border: none;"><i class="bi bi-check-lg"></i>
+          Save &amp; Push Now</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container"></div>
 
@@ -1252,6 +1302,15 @@
       const importBtn = document.getElementById('import-btn');
       const importInput = document.getElementById('import-input');
       const sheetBtn = document.getElementById('sheet-btn');
+      const pushSheetBtn = document.getElementById('push-sheet-btn');
+      const pushSpinner = document.getElementById('push-spinner');
+      const appsScriptModal = document.getElementById('apps-script-modal');
+      const appsScriptCloseBtn = document.getElementById('apps-script-close-btn');
+      const appsScriptCancelBtn = document.getElementById('apps-script-cancel-btn');
+      const appsScriptSaveBtn = document.getElementById('apps-script-save-btn');
+      const copyAppsScriptBtn = document.getElementById('copy-apps-script-btn');
+      const appsScriptUrlInput = document.getElementById('apps-script-url-input');
+      const appsScriptCode = document.getElementById('apps-script-code');
       const syncNowBtn = document.getElementById('sync-now-btn');
       const syncSpinner = document.getElementById('sync-spinner');
       const copySheetBtn = document.getElementById('copy-sheet-btn');
@@ -1416,6 +1475,8 @@
 
         closeModal(formModal);
         renderGrid();
+        const autoPushUrl = localStorage.getItem('google_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
+        if (autoPushUrl) executePush(autoPushUrl, true);
       }
 
       // ── Delete Confirm ───────────────────────────────────
@@ -1435,6 +1496,8 @@
         renderGrid();
         showToast('Video deleted.', 'success');
         pendingDeleteId = null;
+        const autoPushUrl = localStorage.getItem('google_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
+        if (autoPushUrl) executePush(autoPushUrl, true);
       });
 
       // ── Export / Import ───────────────────────────────────
@@ -1479,171 +1542,260 @@
         return match ? match[1] : str;
       }
 
-        function syncGoogleSheet(url, isManual = false) {
-          if (!url) return;
-          if (syncSpinner) syncSpinner.classList.add('spinning');
-          if (isManual) showToast('Connecting to Google Sheet...', 'success');
-          fetch(url)
-            .then(res => res.text())
-            .then(csv => {
-              if (syncSpinner) syncSpinner.classList.remove('spinning');
-              const lines = csv.trim().split(/\r?\n/);
-              if (lines.length > 1) {
-                const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^["']|["']$/g, ''));
-                const list = [];
-                for (let i = 1; i < lines.length; i++) {
-                  if (!lines[i].trim()) continue;
-                  const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/^["']|["']$/g, ''));
-                  const obj = {};
-                  headers.forEach((h, idx) => obj[h] = row[idx] || '');
-                  const raw = obj.youtubelink || obj.youtubeid || obj.link || obj.url || '';
-                  const ytid = extractYouTubeId(raw);
-                  if (ytid) {
-                    list.push({
-                      id: obj.id || ('sheet_' + i),
-                      type: (obj.type || 'long').toLowerCase().trim(),
-                      title: obj.title || 'Project',
-                      youtubeId: ytid,
-                      description: obj.description || '',
-                      createdAt: new Date().toISOString()
-                    });
-                  }
+      function syncGoogleSheet(url, isManual = false) {
+        if (!url) return;
+        if (syncSpinner) syncSpinner.classList.add('spinning');
+        if (isManual) showToast('Connecting to Google Sheet...', 'success');
+        fetch(url)
+          .then(res => res.text())
+          .then(csv => {
+            if (syncSpinner) syncSpinner.classList.remove('spinning');
+            const lines = csv.trim().split(/\r?\n/);
+            if (lines.length > 1) {
+              const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^["']|["']$/g, ''));
+              const list = [];
+              for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/^["']|["']$/g, ''));
+                const obj = {};
+                headers.forEach((h, idx) => obj[h] = row[idx] || '');
+                const raw = obj.youtubelink || obj.youtubeid || obj.link || obj.url || '';
+                const ytid = extractYouTubeId(raw);
+                if (ytid) {
+                  list.push({
+                    id: obj.id || ('sheet_' + i),
+                    type: (obj.type || 'long').toLowerCase().trim(),
+                    title: obj.title || 'Project',
+                    youtubeId: ytid,
+                    description: obj.description || '',
+                    createdAt: new Date().toISOString()
+                  });
                 }
-                if (list.length > 0) {
-                  saveVideos(list);
-                  renderGrid();
-                  if (syncStatusText) syncStatusText.innerHTML = `Live synced with Google Sheet (${list.length} videos).`;
-                  showToast(`Synced ${list.length} videos from Google Sheet!`, 'success');
-                } else {
-                  if (syncStatusText) syncStatusText.innerHTML = `Google Sheet connected (0 video rows found).`;
-                  if (isManual) showToast('Google Sheet is connected, but no video rows were found. Click "Copy for Sheet" to populate it!', 'error');
-                }
-              } else {
-                if (syncStatusText) syncStatusText.innerHTML = `Google Sheet connected (waiting for rows).`;
-                if (isManual) showToast('Google Sheet has only header row. Click "Copy for Sheet" to populate it!', 'error');
               }
-            })
-          .catch (err => {
+              if (list.length > 0) {
+                saveVideos(list);
+                renderGrid();
+                if (syncStatusText) syncStatusText.innerHTML = `Live synced with Google Sheet (${list.length} videos).`;
+                showToast(`Synced ${list.length} videos from Google Sheet!`, 'success');
+              } else {
+                if (syncStatusText) syncStatusText.innerHTML = `Google Sheet connected (0 video rows found).`;
+                if (isManual) showToast('Google Sheet is connected, but no video rows were found. Click "Copy for Sheet" to populate it!', 'error');
+              }
+            } else {
+              if (syncStatusText) syncStatusText.innerHTML = `Google Sheet connected (waiting for rows).`;
+              if (isManual) showToast('Google Sheet has only header row. Click "Copy for Sheet" to populate it!', 'error');
+            }
+          })
+          .catch(err => {
             if (syncSpinner) syncSpinner.classList.remove('spinning');
             if (isManual) showToast('Could not fetch Google Sheet CSV. Check internet or link permissions.', 'error');
           });
-        }
+      }
 
-        // ── Sync Action Buttons ────────────────────────────────
-        // 1. Sync Now button
-        if (syncNowBtn) {
-          syncNowBtn.addEventListener('click', () => {
-            const current = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
-            syncGoogleSheet(current, true);
+      // ── Direct Push Logic & Apps Script Setup ──────────────
+      const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFCCY4SUIsr621SlaK7LHp7Aa6xujqqHIBlYCvLV6OKrvBmNwOyKA1ZD5c0KPDyU4XIA/exec';
+      const APPS_SCRIPT_CODE = `function doGet(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const rows = [];
+  for (let i = 1; i < data.length; i++) {
+    const row = {};
+    headers.forEach((h, idx) => row[h] = data[i][idx]);
+    rows.push(row);
+  }
+  return ContentService.createTextOutput(JSON.stringify(rows)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const body = JSON.parse(e.postData.contents);
+  sheet.clearContents();
+  sheet.appendRow(["id", "type", "title", "youtubelink", "description"]);
+  body.forEach((v, idx) => {
+    const isShort = (v.type || '').toLowerCase() === 'short';
+    const ytUrl = v.youtubelink || (isShort ? 'https://www.youtube.com/shorts/' + v.youtubeId : 'https://www.youtube.com/watch?v=' + v.youtubeId);
+    sheet.appendRow([v.id || (idx + 1), v.type || 'long', v.title || '', ytUrl, v.description || '']);
+  });
+  return ContentService.createTextOutput(JSON.stringify({ status: 'success' })).setMimeType(ContentService.MimeType.JSON);
+}`;
+
+      function executePush(scriptUrl, isSilent = false) {
+        const videos = getVideos();
+        if (!videos.length) {
+          if (!isSilent) showToast('No videos available to push.', 'error');
+          return;
+        }
+        if (pushSpinner) pushSpinner.className = 'bi bi-arrow-repeat spinning';
+        if (!isSilent) showToast('Pushing videos to Google Sheet...', 'success');
+
+        fetch(scriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(videos)
+        })
+          .then(() => {
+            if (pushSpinner) pushSpinner.className = 'bi bi-cloud-arrow-up-fill';
+            if (!isSilent) showToast(`Directly pushed ${videos.length} videos to Google Sheet!`, 'success');
+          })
+          .catch(err => {
+            if (pushSpinner) pushSpinner.className = 'bi bi-cloud-arrow-up-fill';
+            if (!isSilent) showToast('Could not reach Google Apps Script Web App.', 'error');
           });
-        }
+      }
 
-        // 2. Copy for Sheet button (Copies table ready to paste into Google Sheet cell A2)
-        if (copySheetBtn) {
-          copySheetBtn.addEventListener('click', () => {
-            const videos = getVideos();
-            if (!videos.length) {
-              showToast('No videos available to copy.', 'error');
-              return;
-            }
-            let tsv = '';
-            videos.forEach((v, idx) => {
-              const isShort = (v.type || '').toLowerCase() === 'short';
-              const ytUrl = isShort
-                ? `https://www.youtube.com/shorts/${v.youtubeId}`
-                : `https://www.youtube.com/watch?v=${v.youtubeId}`;
-              tsv += `${v.id || (idx + 1)}\t${v.type || 'long'}\t${v.title || 'Project'}\t${ytUrl}\t${v.description || ''}\n`;
+      // 0. Push to Sheet button (Direct auto-sync to Google Sheet)
+      if (pushSheetBtn) {
+        pushSheetBtn.addEventListener('click', () => {
+          const saved = localStorage.getItem('google_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
+          executePush(saved);
+        });
+      }
+
+      if (copyAppsScriptBtn) {
+        copyAppsScriptBtn.addEventListener('click', () => {
+          if (appsScriptCode) {
+            navigator.clipboard.writeText(appsScriptCode.value).then(() => {
+              showToast('Apps Script code copied to clipboard!', 'success');
             });
-
-            navigator.clipboard.writeText(tsv).then(() => {
-              showToast(`Copied ${videos.length} videos to clipboard! Go to Google Sheet cell A2 and press Ctrl+V.`, 'success');
-            }).catch(() => {
-              const ta = document.createElement('textarea');
-              ta.value = tsv;
-              document.body.appendChild(ta);
-              ta.select();
-              document.execCommand('copy');
-              document.body.removeChild(ta);
-              showToast(`Copied ${videos.length} videos! Paste (Ctrl+V) in cell A2 of Google Sheet.`, 'success');
-            });
-          });
-        }
-
-        // 3. Download CSV for Google Sheet button
-        if (csvBtn) {
-          csvBtn.addEventListener('click', () => {
-            const videos = getVideos();
-            let csv = 'id,type,title,youtubelink,description\n';
-            videos.forEach((v, idx) => {
-              const isShort = (v.type || '').toLowerCase() === 'short';
-              const ytUrl = isShort
-                ? `https://www.youtube.com/shorts/${v.youtubeId}`
-                : `https://www.youtube.com/watch?v=${v.youtubeId}`;
-              const cleanTitle = (v.title || '').replace(/"/g, '""');
-              const cleanDesc = (v.description || '').replace(/"/g, '""');
-              csv += `${v.id || (idx + 1)},${v.type || 'long'},"${cleanTitle}",${ytUrl},"${cleanDesc}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'portfolio_videos.csv';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('CSV downloaded! In Google Sheet: File > Import > Upload.', 'success');
-          });
-        }
-
-        // 4. Configure Google Sheet URL button
-        if (sheetBtn) {
-          sheetBtn.addEventListener('click', () => {
-            const current = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
-            const input = prompt('Enter your Google Sheet Published CSV URL:\n(Leave empty to disconnect and use local storage)', current);
-            if (input !== null) {
-              const trimmed = input.trim();
-              if (trimmed) {
-                localStorage.setItem('google_sheets_csv_url', trimmed);
-                syncGoogleSheet(trimmed, true);
-              } else {
-                localStorage.removeItem('google_sheets_csv_url');
-                showToast('Google Sheet disconnected. Using local storage.');
-                if (syncStatusText) syncStatusText.textContent = 'Using local browser storage.';
-              }
-            }
-          });
-        }
-
-        // ── Toast ─────────────────────────────────────────────
-        function showToast(msg, type = 'success') {
-          const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill';
-          const t = document.createElement('div');
-          t.className = `toast ${type}`;
-          t.innerHTML = `<i class="bi ${icon}"></i> ${msg}`;
-          toastCtr.appendChild(t);
-          setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; t.style.transition = '0.3s'; setTimeout(() => t.remove(), 300); }, 3000);
-        }
-
-        // ── Shake helper ──────────────────────────────────────
-        function shake(el) {
-          el.classList.add('shake');
-          el.style.borderColor = '#ff4d4d';
-          setTimeout(() => { el.classList.remove('shake'); el.style.borderColor = ''; }, 600);
-        }
-
-        // ── Keyboard shortcuts ────────────────────────────────
-        document.addEventListener('keydown', e => {
-          if (e.key === 'Escape') {
-            closeModal(formModal);
-            closeModal(confirmModal);
           }
         });
+      }
 
-        // ── Init ──────────────────────────────────────────────
-        renderGrid();
-        const currentSheet = localStorage.getItem("google_sheets_csv_url") || DEFAULT_SHEET_URL;
-        if (currentSheet) syncGoogleSheet(currentSheet);
+      if (appsScriptCloseBtn) appsScriptCloseBtn.addEventListener('click', () => closeModal(appsScriptModal));
+      if (appsScriptCancelBtn) appsScriptCancelBtn.addEventListener('click', () => closeModal(appsScriptModal));
+      if (appsScriptModal) appsScriptModal.addEventListener('click', e => { if (e.target === appsScriptModal) closeModal(appsScriptModal); });
 
-      }) ();
+      if (appsScriptSaveBtn) {
+        appsScriptSaveBtn.addEventListener('click', () => {
+          const val = appsScriptUrlInput.value.trim();
+          if (!val || !val.startsWith('http')) {
+            shake(appsScriptUrlInput);
+            showToast('Please enter a valid Web app URL (starts with https://script.google.com/...)', 'error');
+            return;
+          }
+          localStorage.setItem('google_apps_script_url', val);
+          closeModal(appsScriptModal);
+          executePush(val);
+        });
+      }
+
+      // ── Sync Action Buttons ────────────────────────────────
+      // 1. Sync Now button
+      if (syncNowBtn) {
+        syncNowBtn.addEventListener('click', () => {
+          const current = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
+          syncGoogleSheet(current, true);
+        });
+      }
+
+      // 2. Copy for Sheet button (Copies table ready to paste into Google Sheet cell A2)
+      if (copySheetBtn) {
+        copySheetBtn.addEventListener('click', () => {
+          const videos = getVideos();
+          if (!videos.length) {
+            showToast('No videos available to copy.', 'error');
+            return;
+          }
+          let tsv = '';
+          videos.forEach((v, idx) => {
+            const isShort = (v.type || '').toLowerCase() === 'short';
+            const ytUrl = isShort
+              ? `https://www.youtube.com/shorts/${v.youtubeId}`
+              : `https://www.youtube.com/watch?v=${v.youtubeId}`;
+            tsv += `${v.id || (idx + 1)}\t${v.type || 'long'}\t${v.title || 'Project'}\t${ytUrl}\t${v.description || ''}\n`;
+          });
+
+          navigator.clipboard.writeText(tsv).then(() => {
+            showToast(`Copied ${videos.length} videos to clipboard! Go to Google Sheet cell A2 and press Ctrl+V.`, 'success');
+          }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = tsv;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast(`Copied ${videos.length} videos! Paste (Ctrl+V) in cell A2 of Google Sheet.`, 'success');
+          });
+        });
+      }
+
+      // 3. Download CSV for Google Sheet button
+      if (csvBtn) {
+        csvBtn.addEventListener('click', () => {
+          const videos = getVideos();
+          let csv = 'id,type,title,youtubelink,description\n';
+          videos.forEach((v, idx) => {
+            const isShort = (v.type || '').toLowerCase() === 'short';
+            const ytUrl = isShort
+              ? `https://www.youtube.com/shorts/${v.youtubeId}`
+              : `https://www.youtube.com/watch?v=${v.youtubeId}`;
+            const cleanTitle = (v.title || '').replace(/"/g, '""');
+            const cleanDesc = (v.description || '').replace(/"/g, '""');
+            csv += `${v.id || (idx + 1)},${v.type || 'long'},"${cleanTitle}",${ytUrl},"${cleanDesc}"\n`;
+          });
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'portfolio_videos.csv';
+          a.click();
+          URL.revokeObjectURL(url);
+          showToast('CSV downloaded! In Google Sheet: File > Import > Upload.', 'success');
+        });
+      }
+
+      // 4. Configure Google Sheet URL button
+      if (sheetBtn) {
+        sheetBtn.addEventListener('click', () => {
+          const current = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
+          const input = prompt('Enter your Google Sheet Published CSV URL:\n(Leave empty to disconnect and use local storage)', current);
+          if (input !== null) {
+            const trimmed = input.trim();
+            if (trimmed) {
+              localStorage.setItem('google_sheets_csv_url', trimmed);
+              syncGoogleSheet(trimmed, true);
+            } else {
+              localStorage.removeItem('google_sheets_csv_url');
+              showToast('Google Sheet disconnected. Using local storage.');
+              if (syncStatusText) syncStatusText.textContent = 'Using local browser storage.';
+            }
+          }
+        });
+      }
+
+      // ── Toast ─────────────────────────────────────────────
+      function showToast(msg, type = 'success') {
+        const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill';
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `<i class="bi ${icon}"></i> ${msg}`;
+        toastCtr.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; t.style.transition = '0.3s'; setTimeout(() => t.remove(), 300); }, 3000);
+      }
+
+      // ── Shake helper ──────────────────────────────────────
+      function shake(el) {
+        el.classList.add('shake');
+        el.style.borderColor = '#ff4d4d';
+        setTimeout(() => { el.classList.remove('shake'); el.style.borderColor = ''; }, 600);
+      }
+
+      // ── Keyboard shortcuts ────────────────────────────────
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          closeModal(formModal);
+          closeModal(confirmModal);
+        }
+      });
+
+      // ── Init ──────────────────────────────────────────────
+      renderGrid();
+      const currentSheet = localStorage.getItem("google_sheets_csv_url") || DEFAULT_SHEET_URL;
+      if (currentSheet) syncGoogleSheet(currentSheet);
+
+    })();
   </script>
 </body>
 

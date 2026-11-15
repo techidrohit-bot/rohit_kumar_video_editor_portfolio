@@ -42,135 +42,16 @@
       pointer-events: none;
       overflow: visible;
     }
-    #scroll-track { stroke: rgba(180,120,255,0.15); }
-    #scroll-fill  { stroke: rgba(180,120,255,0.55); filter: url(#glow); }
 
-    /* ---- Apple Crystal Glass Dock Nav ---- */
-    #dock-nav {
-      position: fixed;
-      bottom: 26px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 14px;
-      background: rgba(255, 255, 255, 0.10);
-      backdrop-filter: blur(28px) saturate(200%);
-      -webkit-backdrop-filter: blur(28px) saturate(200%);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      border-top: 1px solid rgba(255, 255, 255, 0.65);
-      border-radius: 999px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35),
-                  0 0 0 1px rgba(255, 255, 255, 0.12),
-                  inset 0 1.5px 2px rgba(255, 255, 255, 0.4),
-                  inset 0 -1.5px 2px rgba(255, 255, 255, 0.08);
-    }
-    /* Subtle glass connecting track like in reference image */
-    #dock-nav::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 24px;
-      right: 24px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-50%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .dock-btn {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      cursor: pointer;
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 18px;
-      text-decoration: none;
-      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  color 0.2s ease,
-                  background 0.25s ease,
-                  box-shadow 0.25s ease,
-                  border-color 0.25s ease;
-      outline: none;
-      flex-shrink: 0;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
-    }
-    .dock-btn:hover {
-      transform: scale(1.18);
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.22);
-      border-color: rgba(255, 255, 255, 0.5);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.5);
-    }
-    .dock-btn.dock-active {
-      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
-      color: #ffffff;
-      border-color: rgba(255, 255, 255, 0.7);
-      box-shadow: 0 0 25px rgba(168, 85, 247, 0.8),
-                  0 4px 14px rgba(124, 58, 237, 0.5),
-                  inset 0 1.5px 2px rgba(255, 255, 255, 0.6);
-    }
-    /* Tooltip */
-    .dock-btn::after {
-      content: attr(data-label);
-      position: absolute;
-      bottom: calc(100% + 12px);
-      left: 50%;
-      transform: translateX(-50%) translateY(4px);
-      background: rgba(20, 20, 25, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      color: #ffffff;
-      font-size: 11px;
-      font-family: 'Nunito', sans-serif;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      white-space: nowrap;
-      padding: 5px 12px;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-    .dock-btn:hover::after {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
+    #scroll-track {
+      stroke: rgba(180, 120, 255, 0.15);
     }
 
-    /* Mobile compact */
-    @media (max-width: 767px) {
-      #dock-nav {
-        bottom: 16px;
-        gap: 6px;
-        padding: 6px 10px;
-      }
-      .dock-btn {
-        width: 38px;
-        height: 38px;
-        font-size: 15px;
-      }
+    #scroll-fill {
+      stroke: rgba(180, 120, 255, 0.55);
+      filter: url(#glow);
     }
 
-    /* Respect reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-      .dock-btn,
-      .dock-btn::after,
-      #scroll-fill {
-        transition: none !important;
-        animation: none !important;
-      }
-    }
   </style>
   <!-- ===== END DOCK NAV + SCROLL PROGRESS STYLES ===== -->
 </head>
@@ -181,14 +62,17 @@
   <svg id="scroll-progress-svg" aria-hidden="true" focusable="false">
     <defs>
       <filter id="glow" x="-50%" y="-10%" width="200%" height="120%">
-        <feGaussianBlur stdDeviation="3" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
     </defs>
     <!-- track path (always visible, faint) -->
-    <path id="scroll-track" fill="none" stroke-width="2" stroke-linecap="round"/>
+    <path id="scroll-track" fill="none" stroke-width="2" stroke-linecap="round" />
     <!-- progress fill path -->
-    <path id="scroll-fill"  fill="none" stroke-width="2" stroke-linecap="round"/>
+    <path id="scroll-fill" fill="none" stroke-width="2" stroke-linecap="round" />
   </svg>
   <!-- ===== END SCROLL PROGRESS SVG ===== -->
 
@@ -378,7 +262,7 @@
               </div>
 
               <div class="cta-section">
-                <a href="assets/pdf/rohit_kumar_resume.pdf" download="Rohit_Kumar_Resume.pdf" target="_blank"
+                  href="assets/pdf/rohit_kumar_resume.pdf" download="Rohit_Kumar_Resume.pdf" target="_blank"
                   class="btn btn-primary">
                   <i class="bi bi-download"></i>
                   Download Resume
@@ -426,19 +310,24 @@
                     <h4>2 Pages Production</h4>
                     <ul>
                       <li>
-                        Edited premium-quality short-form videos for social media, digital marketing campaigns, and branded content.
+                        Edited premium-quality short-form videos for social media, digital marketing campaigns, and
+                        branded content.
                       </li>
                       <li>
-                        Produced advertisements, UGC videos, AI-generated videos, storytelling videos, and promotional content.
+                        Produced advertisements, UGC videos, AI-generated videos, storytelling videos, and promotional
+                        content.
                       </li>
                       <li>
-                        Created motion graphics, dynamic captions, seamless transitions, sound design, and visual effects to enhance viewer engagement.
+                        Created motion graphics, dynamic captions, seamless transitions, sound design, and visual
+                        effects to enhance viewer engagement.
                       </li>
                       <li>
-                        Optimized content for Instagram Reels, YouTube Shorts, and Facebook to maximize audience retention.
+                        Optimized content for Instagram Reels, YouTube Shorts, and Facebook to maximize audience
+                        retention.
                       </li>
                       <li>
-                        Collaborated with creative and marketing teams to deliver high-quality video content within project deadlines.
+                        Collaborated with creative and marketing teams to deliver high-quality video content within
+                        project deadlines.
                       </li>
                     </ul>
                   </div>
@@ -885,160 +774,165 @@
 
   <!-- ===== DOCK NAV HTML ===== -->
   <nav id="dock-nav" role="navigation" aria-label="Quick navigation">
-    <a href="#hero"     class="dock-btn dock-active" data-section="hero"       data-label="Home"       aria-label="Home"><i class="bi bi-house-fill"></i></a>
-    <a href="#about"    class="dock-btn"              data-section="about"      data-label="About"      aria-label="About"><i class="bi bi-person-fill"></i></a>
-    <a href="#experience" class="dock-btn"            data-section="experience" data-label="Experience" aria-label="Experience"><i class="bi bi-briefcase-fill"></i></a>
-    <a href="#portfolio" class="dock-btn"             data-section="portfolio"  data-label="Portfolio"  aria-label="Portfolio"><i class="bi bi-play-btn-fill"></i></a>
-    <a href="admin.html" class="dock-btn"             data-label="Admin"        aria-label="Admin"><i class="bi bi-shield-lock-fill"></i></a>
+    <a href="#hero" class="dock-btn dock-active" data-section="hero" data-label="Home" aria-label="Home"><i
+        class="bi bi-house-fill"></i></a>
+    <a href="#about" class="dock-btn" data-section="about" data-label="About" aria-label="About"><i
+        class="bi bi-person-fill"></i></a>
+    <a href="#experience" class="dock-btn" data-section="experience" data-label="Experience" aria-label="Experience"><i
+        class="bi bi-briefcase-fill"></i></a>
+    <a href="#portfolio" class="dock-btn" data-section="portfolio" data-label="Portfolio" aria-label="Portfolio"><i
+        class="bi bi-play-btn-fill"></i></a>
+    <a href="admin.html" class="dock-btn" data-label="Admin" aria-label="Admin"><i
+        class="bi bi-shield-lock-fill"></i></a>
   </nav>
   <!-- ===== END DOCK NAV HTML ===== -->
 
   <!-- ===== DOCK NAV + SCROLL PROGRESS JS ===== -->
   <script>
-  (function () {
-    /* ---- Scroll Progress ---- */
-    const svg    = document.getElementById('scroll-progress-svg');
-    const track  = document.getElementById('scroll-track');
-    const fill   = document.getElementById('scroll-fill');
+    (function () {
+      /* ---- Scroll Progress ---- */
+      const svg = document.getElementById('scroll-progress-svg');
+      const track = document.getElementById('scroll-track');
+      const fill = document.getElementById('scroll-fill');
 
-    const W = 60;   // svg viewport width
-    const AMP = 18; // horizontal undulation amplitude
-    const CX = W / 2; // center x
+      const W = 60;   // svg viewport width
+      const AMP = 18; // horizontal undulation amplitude
+      const CX = W / 2; // center x
 
-    function buildPath(h) {
-      // Sinusoidal path: M cx,0 C ... down to cx,h
-      // We'll use a series of cubic bezier curves
-      const freq = 0.012; // cycles per pixel
-      const segments = Math.ceil(h / 60);
-      const step = h / segments;
-      let d = `M ${CX} 0`;
-      for (let i = 0; i < segments; i++) {
-        const y0 = i * step;
-        const y1 = (i + 1) * step;
-        const cp1x = CX + AMP * Math.sin(freq * 2 * Math.PI * (y0 + step * 0.33));
-        const cp1y = y0 + step * 0.33;
-        const cp2x = CX + AMP * Math.sin(freq * 2 * Math.PI * (y0 + step * 0.66));
-        const cp2y = y0 + step * 0.66;
-        const ex   = CX + AMP * Math.sin(freq * 2 * Math.PI * y1);
-        d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${ex.toFixed(1)},${y1.toFixed(1)}`;
+      function buildPath(h) {
+        // Sinusoidal path: M cx,0 C ... down to cx,h
+        // We'll use a series of cubic bezier curves
+        const freq = 0.012; // cycles per pixel
+        const segments = Math.ceil(h / 60);
+        const step = h / segments;
+        let d = `M ${CX} 0`;
+        for (let i = 0; i < segments; i++) {
+          const y0 = i * step;
+          const y1 = (i + 1) * step;
+          const cp1x = CX + AMP * Math.sin(freq * 2 * Math.PI * (y0 + step * 0.33));
+          const cp1y = y0 + step * 0.33;
+          const cp2x = CX + AMP * Math.sin(freq * 2 * Math.PI * (y0 + step * 0.66));
+          const cp2y = y0 + step * 0.66;
+          const ex = CX + AMP * Math.sin(freq * 2 * Math.PI * y1);
+          d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${ex.toFixed(1)},${y1.toFixed(1)}`;
+        }
+        return d;
       }
-      return d;
-    }
 
-    let pathLength = 0;
-    let currentH = 0;
+      let pathLength = 0;
+      let currentH = 0;
 
-    function setupPath() {
-      const h = window.innerHeight;
-      if (h === currentH) return;
-      currentH = h;
-      const d = buildPath(h);
-      track.setAttribute('d', d);
-      fill.setAttribute('d', d);
-      pathLength = fill.getTotalLength ? fill.getTotalLength() : h;
-      track.style.strokeDasharray  = pathLength;
-      track.style.strokeDashoffset = 0;
-      fill.style.strokeDasharray   = pathLength;
-      fill.style.strokeDashoffset  = pathLength; // start fully hidden
-    }
-
-    let rafId = null;
-    let targetOffset = null;
-
-    function updateProgress() {
-      const scrollable = document.body.scrollHeight - window.innerHeight;
-      const ratio = scrollable > 0 ? window.scrollY / scrollable : 0;
-      targetOffset = pathLength * (1 - ratio);
-      if (rafId === null) {
-        rafId = requestAnimationFrame(draw);
+      function setupPath() {
+        const h = window.innerHeight;
+        if (h === currentH) return;
+        currentH = h;
+        const d = buildPath(h);
+        track.setAttribute('d', d);
+        fill.setAttribute('d', d);
+        pathLength = fill.getTotalLength ? fill.getTotalLength() : h;
+        track.style.strokeDasharray = pathLength;
+        track.style.strokeDashoffset = 0;
+        fill.style.strokeDasharray = pathLength;
+        fill.style.strokeDashoffset = pathLength; // start fully hidden
       }
-    }
 
-    function draw() {
-      rafId = null;
-      if (targetOffset !== null) {
-        fill.style.strokeDashoffset = targetOffset;
+      let rafId = null;
+      let targetOffset = null;
+
+      function updateProgress() {
+        const scrollable = document.body.scrollHeight - window.innerHeight;
+        const ratio = scrollable > 0 ? window.scrollY / scrollable : 0;
+        targetOffset = pathLength * (1 - ratio);
+        if (rafId === null) {
+          rafId = requestAnimationFrame(draw);
+        }
       }
-    }
 
-    window.addEventListener('resize', () => { setupPath(); updateProgress(); }, { passive: true });
-    window.addEventListener('scroll', updateProgress, { passive: true });
+      function draw() {
+        rafId = null;
+        if (targetOffset !== null) {
+          fill.style.strokeDashoffset = targetOffset;
+        }
+      }
 
-    // Init after DOM is ready
-    setupPath();
-    updateProgress();
+      window.addEventListener('resize', () => { setupPath(); updateProgress(); }, { passive: true });
+      window.addEventListener('scroll', updateProgress, { passive: true });
 
-    /* ---- Dock Nav Active State ---- */
-    const dockBtns = document.querySelectorAll('#dock-nav .dock-btn[data-section]');
-    const sections = Array.from(dockBtns).map(b => document.getElementById(b.dataset.section)).filter(Boolean);
+      // Init after DOM is ready
+      setupPath();
+      updateProgress();
 
-    function setActive(id) {
-      dockBtns.forEach(b => {
-        b.classList.toggle('dock-active', b.dataset.section === id);
-      });
-    }
+      /* ---- Dock Nav Active State ---- */
+      const dockBtns = document.querySelectorAll('#dock-nav .dock-btn[data-section]');
+      const sections = Array.from(dockBtns).map(b => document.getElementById(b.dataset.section)).filter(Boolean);
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) setActive(entry.target.id);
-      });
-    }, { threshold: 0.35 });
-
-    sections.forEach(s => observer.observe(s));
-
-    // Smooth scroll for anchor buttons
-    dockBtns.forEach(btn => {
-      if (btn.getAttribute('href') && btn.getAttribute('href').startsWith('#')) {
-        btn.addEventListener('click', e => {
-          e.preventDefault();
-          const target = document.querySelector(btn.getAttribute('href'));
-          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      function setActive(id) {
+        dockBtns.forEach(b => {
+          b.classList.toggle('dock-active', b.dataset.section === id);
         });
       }
-    });
-  })();
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        });
+      }, { threshold: 0.35 });
+
+      sections.forEach(s => observer.observe(s));
+
+      // Smooth scroll for anchor buttons
+      dockBtns.forEach(btn => {
+        if (btn.getAttribute('href') && btn.getAttribute('href').startsWith('#')) {
+          btn.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.querySelector(btn.getAttribute('href'));
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
+      });
+    })();
   </script>
   <!-- ===== END DOCK NAV + SCROLL PROGRESS JS ===== -->
 
   <!-- ===== DYNAMIC CMS PORTFOLIO LOADER (LocalStorage + Google Sheets) ===== -->
   <script>
-  (function () {
-    const container = document.querySelector('.portfolio-container');
-    if (!container) return;
+    (function () {
+      const container = document.querySelector('.portfolio-container');
+      if (!container) return;
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
 
-    const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStxZnzZUjvBQjRIlbroJZWt0zoSE1-AwFVMpvtfToqQhfgzshbWUgIurObpkN3ll-XEiBFSdCjCS9f/pub?gid=0&single=true&output=csv';
+      const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStxZnzZUjvBQjRIlbroJZWt0zoSE1-AwFVMpvtfToqQhfgzshbWUgIurObpkN3ll-XEiBFSdCjCS9f/pub?gid=0&single=true&output=csv';
 
-    function extractYouTubeId(urlOrId) {
-      if (!urlOrId) return '';
-      const str = String(urlOrId).trim();
-      const match = str.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/) || str.match(/^([\w-]{11})$/);
-      return match ? match[1] : str;
-    }
+      function extractYouTubeId(urlOrId) {
+        if (!urlOrId) return '';
+        const str = String(urlOrId).trim();
+        const match = str.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/) || str.match(/^([\w-]{11})$/);
+        return match ? match[1] : str;
+      }
 
-    function renderVideos(videos) {
-      if (!Array.isArray(videos) || videos.length === 0) return;
+      function renderVideos(videos) {
+        if (!Array.isArray(videos) || videos.length === 0) return;
 
-      let html = '';
-      videos.forEach(v => {
-        const isLong = (v.type || '').toLowerCase() !== 'short';
-        const colClass = isLong ? 'col-lg-6 col-md-6 filter-long_video' : 'col-lg-4 col-md-6 filter-shorts';
-        const ratioClass = isLong ? 'ratio-16x9' : 'ratio-9x16';
-        const category = isLong ? 'Long Videos' : 'Shorts';
+        let html = '';
+        videos.forEach(v => {
+          const isLong = (v.type || '').toLowerCase() !== 'short';
+          const colClass = isLong ? 'col-lg-6 col-md-6 filter-long_video' : 'col-lg-4 col-md-6 filter-shorts';
+          const ratioClass = isLong ? 'ratio-16x9' : 'ratio-9x16';
+          const category = isLong ? 'Long Videos' : 'Shorts';
 
-        const ytid = extractYouTubeId(v.youtubeId || v.youtubelink || '');
-        if (!ytid) return;
+          const ytid = extractYouTubeId(v.youtubeId || v.youtubelink || '');
+          if (!ytid) return;
 
-        html += `
+          html += `
         <div class="${colClass} portfolio-item isotope-item">
           <div class="portfolio-wrap bg-black">
             <div class="ratio ${ratioClass}">
@@ -1057,117 +951,117 @@
             </div>
           </div>
         </div>`;
-      });
+        });
 
-      if (!html) return;
-      container.innerHTML = html;
+        if (!html) return;
+        container.innerHTML = html;
 
-      // Re-layout Isotope if present
-      setTimeout(() => {
-        if (typeof imagesLoaded !== 'undefined' && typeof Isotope !== 'undefined') {
-          imagesLoaded(container, function () {
-            const iso = Isotope.data(container);
-            if (iso) {
-              iso.reloadItems();
-              iso.arrange();
+        // Re-layout Isotope if present
+        setTimeout(() => {
+          if (typeof imagesLoaded !== 'undefined' && typeof Isotope !== 'undefined') {
+            imagesLoaded(container, function () {
+              const iso = Isotope.data(container);
+              if (iso) {
+                iso.reloadItems();
+                iso.arrange();
+              } else {
+                new Isotope(container, {
+                  itemSelector: '.isotope-item',
+                  layoutMode: 'masonry',
+                  filter: '.filter-long_video'
+                });
+              }
+            });
+          }
+        }, 60);
+      }
+
+      // Parse Google Sheet CSV format: id,type,title,youtubelink,description
+      function parseCSV(text) {
+        const lines = text.trim().split(/\r?\n/);
+        if (lines.length < 2) return [];
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^["']|["']$/g, ''));
+        const list = [];
+        for (let i = 1; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/^["']|["']$/g, ''));
+          const obj = {};
+          headers.forEach((h, idx) => {
+            obj[h] = row[idx] || '';
+          });
+          const rawLink = obj.youtubelink || obj.youtubeid || obj.link || obj.url || '';
+          const ytid = extractYouTubeId(rawLink);
+          if (ytid) {
+            list.push({
+              id: obj.id || ('sheet_' + i),
+              type: (obj.type || 'long').toLowerCase().trim(),
+              title: obj.title || 'Project',
+              youtubeId: ytid,
+              description: obj.description || ''
+            });
+          }
+        }
+        return list;
+      }
+
+      const DEFAULT_VIDEOS = [
+        { id: '1', type: 'long', title: 'Podcast hook', youtubeId: '1Yj80vtI97Q', description: 'Podcast hook edit' },
+        { id: '2', type: 'long', title: 'Audi edit', youtubeId: '9j_b0VbPDOY', description: 'Commercial car edit' },
+        { id: '3', type: 'long', title: 'Observenow', youtubeId: 'Yg5PuOR4Alk', description: 'Event edit' },
+        { id: '4', type: 'long', title: 'Sample video', youtubeId: 'SgQohJ0Lqfw', description: 'Corporate video' },
+        { id: '5', type: 'long', title: 'Project 5', youtubeId: 'zcr-xLVKU8I', description: 'Storytelling video' },
+        { id: '6', type: 'long', title: 'Project 6', youtubeId: 'HLtdvIg_wWo', description: 'Commercial video' },
+        { id: '7', type: 'long', title: 'Project 7', youtubeId: 'cxMQMqzvALY', description: 'Creative edit' },
+        { id: '8', type: 'short', title: 'Show up honestly', youtubeId: '45CQ2tHeBYY', description: 'Vertical reel' },
+        { id: '9', type: 'short', title: 'Motion graphics', youtubeId: 'lqhDXJiUbBA', description: 'Motion graphics reel' },
+        { id: '10', type: 'short', title: 'AI Mic ads', youtubeId: 'XO8-QAc_mxE', description: 'Product ad' },
+        { id: '11', type: 'short', title: 'The tatva', youtubeId: '3N0wOA7ffSM', description: 'Narrative short' },
+        { id: '12', type: 'short', title: 'Map Animation', youtubeId: 'Wcsalzd5y78', description: 'Map animation short' },
+        { id: '13', type: 'short', title: 'Task video', youtubeId: 'ySm_Cj2iLVs', description: 'Lifestyle reel' },
+        { id: '14', type: 'short', title: 'Reel Edit 7', youtubeId: 'zsQVjWfUidI', description: 'Social media short' },
+        { id: '15', type: 'short', title: 'Reel Edit 8', youtubeId: 'v5VNUACuJw4', description: 'Social media short' },
+        { id: '16', type: 'short', title: 'Reel Edit 9', youtubeId: '_wq3_6-r3Og', description: 'Social media short' }
+      ];
+
+      // 1. Fetch live Google Sheet
+      const sheetUrl = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
+      if (sheetUrl) {
+        fetch(sheetUrl)
+          .then(res => res.text())
+          .then(csvText => {
+            const videosFromSheet = parseCSV(csvText);
+            if (videosFromSheet.length > 0) {
+              renderVideos(videosFromSheet);
+              localStorage.setItem('portfolio_videos', JSON.stringify(videosFromSheet));
             } else {
-              new Isotope(container, {
-                itemSelector: '.isotope-item',
-                layoutMode: 'masonry',
-                filter: '.filter-long_video'
-              });
+              loadFromLocal();
             }
-          });
-        }
-      }, 60);
-    }
-
-    // Parse Google Sheet CSV format: id,type,title,youtubelink,description
-    function parseCSV(text) {
-      const lines = text.trim().split(/\r?\n/);
-      if (lines.length < 2) return [];
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^["']|["']$/g, ''));
-      const list = [];
-      for (let i = 1; i < lines.length; i++) {
-        if (!lines[i].trim()) continue;
-        const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/^["']|["']$/g, ''));
-        const obj = {};
-        headers.forEach((h, idx) => {
-          obj[h] = row[idx] || '';
-        });
-        const rawLink = obj.youtubelink || obj.youtubeid || obj.link || obj.url || '';
-        const ytid = extractYouTubeId(rawLink);
-        if (ytid) {
-          list.push({
-            id: obj.id || ('sheet_' + i),
-            type: (obj.type || 'long').toLowerCase().trim(),
-            title: obj.title || 'Project',
-            youtubeId: ytid,
-            description: obj.description || ''
-          });
-        }
-      }
-      return list;
-    }
-
-    const DEFAULT_VIDEOS = [
-      { id: '1', type: 'long', title: 'Podcast hook', youtubeId: '1Yj80vtI97Q', description: 'Podcast hook edit' },
-      { id: '2', type: 'long', title: 'Audi edit', youtubeId: '9j_b0VbPDOY', description: 'Commercial car edit' },
-      { id: '3', type: 'long', title: 'Observenow', youtubeId: 'Yg5PuOR4Alk', description: 'Event edit' },
-      { id: '4', type: 'long', title: 'Sample video', youtubeId: 'SgQohJ0Lqfw', description: 'Corporate video' },
-      { id: '5', type: 'long', title: 'Project 5', youtubeId: 'zcr-xLVKU8I', description: 'Storytelling video' },
-      { id: '6', type: 'long', title: 'Project 6', youtubeId: 'HLtdvIg_wWo', description: 'Commercial video' },
-      { id: '7', type: 'long', title: 'Project 7', youtubeId: 'cxMQMqzvALY', description: 'Creative edit' },
-      { id: '8', type: 'short', title: 'Show up honestly', youtubeId: '45CQ2tHeBYY', description: 'Vertical reel' },
-      { id: '9', type: 'short', title: 'Motion graphics', youtubeId: 'lqhDXJiUbBA', description: 'Motion graphics reel' },
-      { id: '10', type: 'short', title: 'AI Mic ads', youtubeId: 'XO8-QAc_mxE', description: 'Product ad' },
-      { id: '11', type: 'short', title: 'The tatva', youtubeId: '3N0wOA7ffSM', description: 'Narrative short' },
-      { id: '12', type: 'short', title: 'Map Animation', youtubeId: 'Wcsalzd5y78', description: 'Map animation short' },
-      { id: '13', type: 'short', title: 'Task video', youtubeId: 'ySm_Cj2iLVs', description: 'Lifestyle reel' },
-      { id: '14', type: 'short', title: 'Reel Edit 7', youtubeId: 'zsQVjWfUidI', description: 'Social media short' },
-      { id: '15', type: 'short', title: 'Reel Edit 8', youtubeId: 'v5VNUACuJw4', description: 'Social media short' },
-      { id: '16', type: 'short', title: 'Reel Edit 9', youtubeId: '_wq3_6-r3Og', description: 'Social media short' }
-    ];
-
-    // 1. Fetch live Google Sheet
-    const sheetUrl = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
-    if (sheetUrl) {
-      fetch(sheetUrl)
-        .then(res => res.text())
-        .then(csvText => {
-          const videosFromSheet = parseCSV(csvText);
-          if (videosFromSheet.length > 0) {
-            renderVideos(videosFromSheet);
-            localStorage.setItem('portfolio_videos', JSON.stringify(videosFromSheet));
-          } else {
+          })
+          .catch(err => {
+            console.warn('Google Sheets fetch failed, falling back to local storage:', err);
             loadFromLocal();
-          }
-        })
-        .catch(err => {
-          console.warn('Google Sheets fetch failed, falling back to local storage:', err);
-          loadFromLocal();
-        });
-    } else {
-      loadFromLocal();
-    }
-
-    function loadFromLocal() {
-      const localData = localStorage.getItem('portfolio_videos');
-      if (localData) {
-        try {
-          const parsed = JSON.parse(localData);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            renderVideos(parsed);
-            return;
-          }
-        } catch (e) {
-          console.error('Failed to parse portfolio_videos from localStorage', e);
-        }
+          });
+      } else {
+        loadFromLocal();
       }
-      renderVideos(DEFAULT_VIDEOS);
-      localStorage.setItem('portfolio_videos', JSON.stringify(DEFAULT_VIDEOS));
-    }
-  })();
+
+      function loadFromLocal() {
+        const localData = localStorage.getItem('portfolio_videos');
+        if (localData) {
+          try {
+            const parsed = JSON.parse(localData);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              renderVideos(parsed);
+              return;
+            }
+          } catch (e) {
+            console.error('Failed to parse portfolio_videos from localStorage', e);
+          }
+        }
+        renderVideos(DEFAULT_VIDEOS);
+        localStorage.setItem('portfolio_videos', JSON.stringify(DEFAULT_VIDEOS));
+      }
+    })();
   </script>
 </body>
 
