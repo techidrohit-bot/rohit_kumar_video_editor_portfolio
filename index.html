@@ -591,7 +591,7 @@
                     <div class="portfolio-info">
                       <div class="content">
                         <span class="category">Long Videos</span>
-                        <h4>Project 1</h4>
+                        <h4>Podcast hook</h4>
                       </div>
                     </div>
                   </div>
@@ -605,7 +605,7 @@
                     <div class="portfolio-info">
                       <div class="content">
                         <span class="category">Long Videos</span>
-                        <h4>Project 2</h4>
+                        <h4>Audi edit</h4>
                       </div>
                     </div>
                   </div>
@@ -619,7 +619,7 @@
                     <div class="portfolio-info">
                       <div class="content">
                         <span class="category">Long Videos</span>
-                        <h4>Project 3</h4>
+                        <h4>Observenow</h4>
                       </div>
                     </div>
                   </div>
@@ -633,7 +633,7 @@
                     <div class="portfolio-info">
                       <div class="content">
                         <span class="category">Long Videos</span>
-                        <h4>Project 4</h4>
+                        <h4>Sample video</h4>
                       </div>
                     </div>
                   </div>
@@ -692,7 +692,7 @@
                     <div class="portfolio-info">
                       <div class="content">
                         <span class="category">Shorts</span>
-                        <h4>Short 1</h4>
+                        <h4>Show up honestly</h4>
                       </div>
                     </div>
                   </div>
@@ -706,7 +706,7 @@
                     <div class="portfolio-info">
                       <div class="content">
                         <span class="category">Shorts</span>
-                        <h4>Short 2</h4>
+                        <h4>Motion graphics</h4>
                       </div>
                     </div>
                   </div>
@@ -721,7 +721,7 @@
                     <div class="portfolio-info">
                       <div class="content">
                         <span class="category">Shorts</span>
-                        <h4>Short 3</h4>
+                        <h4>AI Mic ads</h4>
                       </div>
                     </div>
                   </div>
@@ -736,7 +736,7 @@
                     <div class="portfolio-info">
                       <div class="content">
                         <span class="category">Shorts</span>
-                        <h4>Short 4</h4>
+                        <h4>The tatva</h4>
                       </div>
                     </div>
                   </div>
@@ -751,7 +751,7 @@
                     <div class="portfolio-info">
                       <div class="content">
                         <span class="category">Shorts</span>
-                        <h4>Short 5</h4>
+                        <h4>Map Animation</h4>
                       </div>
                     </div>
                   </div>
@@ -766,7 +766,7 @@
                     <div class="portfolio-info">
                       <div class="content">
                         <span class="category">Shorts</span>
-                        <h4>Short 6</h4>
+                        <h4>Task video</h4>
                       </div>
                     </div>
                   </div>
@@ -1085,6 +1085,25 @@
       return list;
     }
 
+    const DEFAULT_VIDEOS = [
+      { id: '1', type: 'long', title: 'Podcast hook', youtubeId: '1Yj80vtI97Q', description: 'Podcast hook edit' },
+      { id: '2', type: 'long', title: 'Audi edit', youtubeId: '9j_b0VbPDOY', description: 'Commercial car edit' },
+      { id: '3', type: 'long', title: 'Observenow', youtubeId: 'Yg5PuOR4Alk', description: 'Event edit' },
+      { id: '4', type: 'long', title: 'Sample video', youtubeId: 'SgQohJ0Lqfw', description: 'Corporate video' },
+      { id: '5', type: 'long', title: 'Project 5', youtubeId: 'zcr-xLVKU8I', description: 'Storytelling video' },
+      { id: '6', type: 'long', title: 'Project 6', youtubeId: 'HLtdvIg_wWo', description: 'Commercial video' },
+      { id: '7', type: 'long', title: 'Project 7', youtubeId: 'cxMQMqzvALY', description: 'Creative edit' },
+      { id: '8', type: 'short', title: 'Show up honestly', youtubeId: '45CQ2tHeBYY', description: 'Vertical reel' },
+      { id: '9', type: 'short', title: 'Motion graphics', youtubeId: 'lqhDXJiUbBA', description: 'Motion graphics reel' },
+      { id: '10', type: 'short', title: 'AI Mic ads', youtubeId: 'XO8-QAc_mxE', description: 'Product ad' },
+      { id: '11', type: 'short', title: 'The tatva', youtubeId: '3N0wOA7ffSM', description: 'Narrative short' },
+      { id: '12', type: 'short', title: 'Map Animation', youtubeId: 'Wcsalzd5y78', description: 'Map animation short' },
+      { id: '13', type: 'short', title: 'Task video', youtubeId: 'ySm_Cj2iLVs', description: 'Lifestyle reel' },
+      { id: '14', type: 'short', title: 'Reel Edit 7', youtubeId: 'zsQVjWfUidI', description: 'Social media short' },
+      { id: '15', type: 'short', title: 'Reel Edit 8', youtubeId: 'v5VNUACuJw4', description: 'Social media short' },
+      { id: '16', type: 'short', title: 'Reel Edit 9', youtubeId: '_wq3_6-r3Og', description: 'Social media short' }
+    ];
+
     // 1. Fetch live Google Sheet
     const sheetUrl = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
     if (sheetUrl) {
@@ -1114,11 +1133,14 @@
           const parsed = JSON.parse(localData);
           if (Array.isArray(parsed) && parsed.length > 0) {
             renderVideos(parsed);
+            return;
           }
         } catch (e) {
           console.error('Failed to parse portfolio_videos from localStorage', e);
         }
       }
+      renderVideos(DEFAULT_VIDEOS);
+      localStorage.setItem('portfolio_videos', JSON.stringify(DEFAULT_VIDEOS));
     }
   })();
   </script>
