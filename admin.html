@@ -1306,12 +1306,14 @@
         try { return JSON.parse(localStorage.getItem(LS_VIDEOS)) || []; }
         catch { return []; }
       }
+      // Track whether user has ever intentionally saved (even empty list)
+      function hasUserSavedBefore() { return localStorage.getItem(LS_VIDEOS) !== null; }
       function saveVideos(arr) { localStorage.setItem(LS_VIDEOS, JSON.stringify(arr)); }
 
       function thumbUrl(ytId) { return 'https://img.youtube.com/vi/' + ytId + '/mqdefault.jpg'; }
 
-      // ── Seed ──────────────────────────────────────────────
-      if (!localStorage.getItem(LS_VIDEOS)) {
+      // ── Seed (only if user has never saved anything before) ──────────────────────────────────────
+      if (!hasUserSavedBefore()) {
         saveVideos([...SEED_LONG, ...SEED_SHORTS]);
       }
 
@@ -1682,10 +1684,22 @@
                     }
                   }
                   if (list.length > 0) {
-                    saveVideos(list);
-                    renderGrid();
-                    if (syncStatusText) syncStatusText.innerHTML = `Live synced with Google Sheet (${list.length} videos).`;
-                    showToast(`Synced ${list.length} videos from Google Sheet!`, 'success');
+                    // Only overwrite localStorage if user hasn't manually edited (auto-sync respects local edits)
+                    // Key fix: only sync from sheet on auto-load, NOT if isManual=false and local already has data
+                    if (isManual) {
+                      saveVideos(list);
+                      renderGrid();
+                      if (syncStatusText) syncStatusText.innerHTML = `Live synced with Google Sheet (${list.length} videos).`;
+                      showToast(`Synced ${list.length} videos from Google Sheet!`, 'success');
+                    } else {
+                      // Auto load on page init: only populate if localStorage is truly empty/missing
+                      const existing = getVideos();
+                      if (existing.length === 0 && !localStorage.getItem(LS_VIDEOS)) {
+                        saveVideos(list);
+                        renderGrid();
+                      }
+                      if (syncStatusText) syncStatusText.innerHTML = `Google Sheet connected (${list.length} videos available).`;
+                    }
                   } else {
                     if (syncStatusText) syncStatusText.innerHTML = `Google Sheet connected (0 video rows found).`;
                     if (isManual) showToast('Google Sheet is connected, but no video rows were found. Click "Copy for Sheet" to populate it!', 'error');
