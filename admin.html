@@ -1115,6 +1115,8 @@
           JSON</button>
         <button class="btn-sm" id="import-btn" title="Upload JSON backup"><i class="bi bi-upload"></i> Import
           JSON</button>
+        <button class="btn-sm" id="reset-default-btn" title="Reset both Admin and Google Sheet to default 16 projects"><i
+            class="bi bi-arrow-counterclockwise"></i> Reset to Default</button>
         <input type="file" id="import-input" accept=".json" />
       </div>
     </div>
@@ -1357,6 +1359,7 @@
       const syncSpinner = document.getElementById('sync-spinner');
       const copySheetBtn = document.getElementById('copy-sheet-btn');
       const csvBtn = document.getElementById('csv-btn');
+      const resetDefaultBtn = document.getElementById('reset-default-btn');
       const syncStatusText = document.getElementById('sync-status-text');
       const toastCtr = document.getElementById('toast-container');
 
@@ -1867,6 +1870,37 @@ function doPost(e) {
                   showToast('Google Sheet disconnected. Using local storage.');
                   if (syncStatusText) syncStatusText.textContent = 'Using local browser storage.';
                 }
+              }
+            });
+          }
+
+          // 5. Reset to Default button
+          if (resetDefaultBtn) {
+            resetDefaultBtn.addEventListener('click', () => {
+              if (confirm('Are you sure you want to reset all videos and your Google Sheet back to the clean default 16 projects?')) {
+                const defaultVideos = [
+                  { id: '1', type: 'long', title: 'Podcast hook', youtubeId: '1Yj80vtI97Q', description: 'Podcast hook edit', createdAt: new Date().toISOString() },
+                  { id: '2', type: 'long', title: 'Audi edit', youtubeId: '9j_b0VbPDOY', description: 'Commercial car edit', createdAt: new Date().toISOString() },
+                  { id: '3', type: 'long', title: 'Observenow', youtubeId: 'Yg5PuOR4Alk', description: 'Event edit', createdAt: new Date().toISOString() },
+                  { id: '4', type: 'long', title: 'Sample video', youtubeId: 'SgQohJ0Lqfw', description: 'Corporate video', createdAt: new Date().toISOString() },
+                  { id: '5', type: 'long', title: 'Project 5', youtubeId: 'zcr-xLVKU8I', description: 'Storytelling video', createdAt: new Date().toISOString() },
+                  { id: '6', type: 'long', title: 'Project 6', youtubeId: 'HLtdvIg_wWo', description: 'Commercial video', createdAt: new Date().toISOString() },
+                  { id: '7', type: 'long', title: 'Project 7', youtubeId: 'cxMQMqzvALY', description: 'Creative edit', createdAt: new Date().toISOString() },
+                  { id: '8', type: 'short', title: 'Show up honestly', youtubeId: '45CQ2tHeBYY', description: 'Vertical reel', createdAt: new Date().toISOString() },
+                  { id: '9', type: 'short', title: 'Motion graphics', youtubeId: 'lqhDXJiUbBA', description: 'Motion graphics reel', createdAt: new Date().toISOString() },
+                  { id: '10', type: 'short', title: 'AI Mic ads', youtubeId: 'XO8-QAc_mxE', description: 'Product ad', createdAt: new Date().toISOString() },
+                  { id: '11', type: 'short', title: 'The tatva', youtubeId: '3N0wOA7ffSM', description: 'Narrative short', createdAt: new Date().toISOString() },
+                  { id: '12', type: 'short', title: 'Map Animation', youtubeId: 'Wcsalzd5y78', description: 'Map animation short', createdAt: new Date().toISOString() },
+                  { id: '13', type: 'short', title: 'Task video', youtubeId: 'ySm_Cj2iLVs', description: 'Lifestyle reel', createdAt: new Date().toISOString() },
+                  { id: '14', type: 'short', title: 'Reel Edit 7', youtubeId: 'zsQVjWfUidI', description: 'Social media short', createdAt: new Date().toISOString() },
+                  { id: '15', type: 'short', title: 'Reel Edit 8', youtubeId: 'v5VNUACuJw4', description: 'Social media short', createdAt: new Date().toISOString() },
+                  { id: '16', type: 'short', title: 'Reel Edit 9', youtubeId: '_wq3_6-r3Og', description: 'Social media short', createdAt: new Date().toISOString() }
+                ];
+                saveVideos(defaultVideos);
+                renderGrid();
+                showToast('Reset back to default 16 projects!', 'success');
+                const autoPushUrl = localStorage.getItem('google_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
+                if (autoPushUrl) executePush(autoPushUrl, false);
               }
             });
           }
