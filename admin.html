@@ -1275,138 +1275,183 @@
       'use strict';
 
       // ── Constants ──────────────────────────────────────────
-      const PASSWORD = 'rohit2025';
       const LS_AUTH = 'admin_auth_rohit';
       const LS_VIDEOS = 'portfolio_videos';
 
-      const SEED_LONG = [
-        { id: uid(), type: 'long', title: 'Podcast hook', youtubeId: '1Yj80vtI97Q', description: 'Podcast hook edit', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'long', title: 'Audi edit', youtubeId: '9j_b0VbPDOY', description: 'Commercial car edit', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'long', title: 'Observenow', youtubeId: 'Yg5PuOR4Alk', description: 'Event edit', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'long', title: 'Sample video', youtubeId: 'SgQohJ0Lqfw', description: 'Corporate video', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'long', title: 'Project 5', youtubeId: 'zcr-xLVKU8I', description: 'Storytelling video', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'long', title: 'Project 6', youtubeId: 'HLtdvIg_wWo', description: 'Commercial video', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'long', title: 'Project 7', youtubeId: 'cxMQMqzvALY', description: 'Creative edit', createdAt: new Date().toISOString() },
-      ];
-      const SEED_SHORTS = [
-        { id: uid(), type: 'short', title: 'Show up honestly', youtubeId: '45CQ2tHeBYY', description: 'Vertical reel', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'short', title: 'Motion graphics', youtubeId: 'lqhDXJiUbBA', description: 'Motion graphics reel', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'short', title: 'AI Mic ads', youtubeId: 'XO8-QAc_mxE', description: 'Product ad', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'short', title: 'The tatva', youtubeId: '3N0wOA7ffSM', description: 'Narrative short', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'short', title: 'Map Animation', youtubeId: 'Wcsalzd5y78', description: 'Map animation short', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'short', title: 'Task video', youtubeId: 'ySm_Cj2iLVs', description: 'Lifestyle reel', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'short', title: 'Reel Edit 7', youtubeId: 'zsQVjWfUidI', description: 'Social media short', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'short', title: 'Reel Edit 8', youtubeId: 'v5VNUACuJw4', description: 'Social media short', createdAt: new Date().toISOString() },
-        { id: uid(), type: 'short', title: 'Reel Edit 9', youtubeId: '_wq3_6-r3Og', description: 'Social media short', createdAt: new Date().toISOString() },
-      ];
-
       // ── Helpers ───────────────────────────────────────────
       function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
-
-      function getVideos() {
-        try { return JSON.parse(localStorage.getItem(LS_VIDEOS)) || []; }
-        catch { return []; }
-      }
-      // Track whether user has ever intentionally saved (even empty list)
-      function hasUserSavedBefore() { return localStorage.getItem(LS_VIDEOS) !== null; }
-      function saveVideos(arr) { localStorage.setItem(LS_VIDEOS, JSON.stringify(arr)); }
-
       function thumbUrl(ytId) { return 'https://img.youtube.com/vi/' + ytId + '/mqdefault.jpg'; }
 
-        // ── Seed (only if user has never saved anything before) ──────────────────────────────────────
-        if (!hasUserSavedBefore()) {
-          saveVideos([...SEED_LONG, ...SEED_SHORTS]);
-        }
+      // ── Apps Script URL (single source of truth) ──────────
+      const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFCCY4SUIsr621SlaK7LHp7Aa6xujqqHIBlYCvLV6OKrvBmNwOyKA1ZD5c0KPDyU4XIA/exec';
 
-        // ── State ─────────────────────────────────────────────
-        let activeTab = 'long';
-        let pendingDeleteId = null;
+      // ── In-memory state (cache from Sheet) ────────────────
+      // No localStorage for video data. Sheet IS the database.
+      let videos = [];   // full list, loaded from Sheet on page open
+      let activeTab = 'long';
+      let pendingDeleteId = null;
 
-        // ── DOM refs ─────────────────────────────────────────
-        const dashboard = document.getElementById('dashboard');
-        const sidebarTabs = document.querySelectorAll('.sidebar-tab');
-        const videoGrid = document.getElementById('video-grid');
-        const longCount = document.getElementById('long-count');
-        const shortCount = document.getElementById('short-count');
-        const sectionTitle = document.getElementById('section-title');
-        const addBtn = document.getElementById('add-btn');
-        const formModal = document.getElementById('form-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalCloseBtn = document.getElementById('modal-close-btn');
-        const formCancelBtn = document.getElementById('form-cancel-btn');
-        const formSaveBtn = document.getElementById('form-save-btn');
-        const confirmModal = document.getElementById('confirm-modal');
-        const confirmCancel = document.getElementById('confirm-cancel-btn');
-        const confirmDelete = document.getElementById('confirm-delete-btn');
-        const fTitle = document.getElementById('f-title');
-        const fYtid = document.getElementById('f-ytid');
-        const fType = document.getElementById('f-type');
-        const fDesc = document.getElementById('f-desc');
-        const fPos = document.getElementById('f-pos');
-        const editId = document.getElementById('edit-id');
-        const thumbPreview = document.getElementById('thumb-preview');
-        const exportBtn = document.getElementById('export-btn');
-        const importBtn = document.getElementById('import-btn');
-        const importInput = document.getElementById('import-input');
-        const sheetBtn = document.getElementById('sheet-btn');
-        const pushSheetBtn = document.getElementById('push-sheet-btn');
-        const pushSpinner = document.getElementById('push-spinner');
-        const appsScriptModal = document.getElementById('apps-script-modal');
-        const appsScriptCloseBtn = document.getElementById('apps-script-close-btn');
-        const appsScriptCancelBtn = document.getElementById('apps-script-cancel-btn');
-        const appsScriptSaveBtn = document.getElementById('apps-script-save-btn');
-        const copyAppsScriptBtn = document.getElementById('copy-apps-script-btn');
-        const appsScriptUrlInput = document.getElementById('apps-script-url-input');
-        const appsScriptCode = document.getElementById('apps-script-code');
-        const syncNowBtn = document.getElementById('sync-now-btn');
-        const syncSpinner = document.getElementById('sync-spinner');
-        const copySheetBtn = document.getElementById('copy-sheet-btn');
-        const csvBtn = document.getElementById('csv-btn');
-        const resetDefaultBtn = document.getElementById('reset-default-btn');
-        const syncStatusText = document.getElementById('sync-status-text');
-        const toastCtr = document.getElementById('toast-container');
+      // ── DOM refs ─────────────────────────────────────────
+      const dashboard = document.getElementById('dashboard');
+      const sidebarTabs = document.querySelectorAll('.sidebar-tab');
+      const videoGrid = document.getElementById('video-grid');
+      const longCount = document.getElementById('long-count');
+      const shortCount = document.getElementById('short-count');
+      const sectionTitle = document.getElementById('section-title');
+      const addBtn = document.getElementById('add-btn');
+      const formModal = document.getElementById('form-modal');
+      const modalTitle = document.getElementById('modal-title');
+      const modalCloseBtn = document.getElementById('modal-close-btn');
+      const formCancelBtn = document.getElementById('form-cancel-btn');
+      const formSaveBtn = document.getElementById('form-save-btn');
+      const confirmModal = document.getElementById('confirm-modal');
+      const confirmCancel = document.getElementById('confirm-cancel-btn');
+      const confirmDelete = document.getElementById('confirm-delete-btn');
+      const fTitle = document.getElementById('f-title');
+      const fYtid = document.getElementById('f-ytid');
+      const fType = document.getElementById('f-type');
+      const fDesc = document.getElementById('f-desc');
+      const fPos = document.getElementById('f-pos');
+      const editId = document.getElementById('edit-id');
+      const thumbPreview = document.getElementById('thumb-preview');
+      const exportBtn = document.getElementById('export-btn');
+      const importBtn = document.getElementById('import-btn');
+      const importInput = document.getElementById('import-input');
+      const sheetBtn = document.getElementById('sheet-btn');
+      const pushSheetBtn = document.getElementById('push-sheet-btn');
+      const pushSpinner = document.getElementById('push-spinner');
+      const appsScriptModal = document.getElementById('apps-script-modal');
+      const appsScriptCloseBtn = document.getElementById('apps-script-close-btn');
+      const appsScriptCancelBtn = document.getElementById('apps-script-cancel-btn');
+      const appsScriptSaveBtn = document.getElementById('apps-script-save-btn');
+      const copyAppsScriptBtn = document.getElementById('copy-apps-script-btn');
+      const appsScriptUrlInput = document.getElementById('apps-script-url-input');
+      const appsScriptCode = document.getElementById('apps-script-code');
+      const syncNowBtn = document.getElementById('sync-now-btn');
+      const syncSpinner = document.getElementById('sync-spinner');
+      const copySheetBtn = document.getElementById('copy-sheet-btn');
+      const csvBtn = document.getElementById('csv-btn');
+      const resetDefaultBtn = document.getElementById('reset-default-btn');
+      const syncStatusText = document.getElementById('sync-status-text');
+      const toastCtr = document.getElementById('toast-container');
 
-        // ── Tabs ─────────────────────────────────────────────
-        sidebarTabs.forEach(tab => {
-          tab.addEventListener('click', () => {
-            activeTab = tab.dataset.tab;
-            sidebarTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            if (activeTab === 'long') {
-              sectionTitle.innerHTML = 'Long <span>Videos</span>';
-            } else {
-              sectionTitle.innerHTML = '<span>Shorts</span>';
-            }
-            renderGrid();
-          });
+      // ── Utils ─────────────────────────────────────────────
+      function escHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+      function extractYouTubeId(raw) {
+        if (!raw) return '';
+        const s = String(raw).trim();
+        const m = s.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([a-zA-Z0-9_-]{11})/) || s.match(/^([a-zA-Z0-9_-]{11})$/);
+        return m ? m[1] : s;
+      }
+      function setStatus(msg, ok = true) {
+        if (syncStatusText) syncStatusText.innerHTML = msg;
+      }
+      function showToast(msg, type = 'success') {
+        const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill';
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `<i class="bi ${icon}"></i> ${msg}`;
+        toastCtr.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; t.style.transition = '0.3s'; setTimeout(() => t.remove(), 300); }, 3500);
+      }
+      function shake(el) {
+        el.classList.add('shake'); el.style.borderColor = '#ff4d4d';
+        setTimeout(() => { el.classList.remove('shake'); el.style.borderColor = ''; }, 600);
+      }
+      function openModal(el) { el.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      function closeModal(el) { el.classList.remove('open'); document.body.style.overflow = ''; }
+
+      // ── API: call Apps Script ──────────────────────────────
+      async function api(payload) {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',          // Apps Script requires no-cors
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
+        // no-cors = opaque response, we can't read body — that's fine
+      }
 
-        // ── Render ────────────────────────────────────────────
-        function renderGrid() {
-          const videos = getVideos();
-          const filtered = videos.filter(v => v.type === activeTab);
+      // For reading (GET), we use the published CSV URL
+      const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStxZnzZUjvBQjRIlbroJZWt0zoSE1-AwFVMpvtfToqQhfgzshbWUgIurObpkN3ll-XEiBFSdCjCS9f/pub?gid=0&single=true&output=csv';
 
-          // Update counts
-          longCount.textContent = videos.filter(v => v.type === 'long').length;
-          shortCount.textContent = videos.filter(v => v.type === 'short').length;
+      async function fetchVideosFromSheet() {
+        setStatus('<i class="bi bi-arrow-repeat spinning"></i> Loading from Google Sheet…');
+        try {
+          const res = await fetch(SHEET_CSV_URL + '&t=' + Date.now());
+          const csv = await res.text();
+          const lines = csv.trim().split(/\r?\n/);
+          if (lines.length < 2) { videos = []; return; }
+          const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^["']|["']$/g, ''));
+          const list = [];
+          for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/^["']|["']$/g, ''));
+            const obj = {};
+            headers.forEach((h, idx) => obj[h] = row[idx] || '');
+            const raw = obj.youtubelink || obj.youtubeid || obj.link || obj.url || '';
+            const ytid = extractYouTubeId(raw);
+            if (ytid) {
+              list.push({
+                id: obj.id || ('s_' + i),
+                type: (obj.type || 'long').toLowerCase().trim(),
+                title: obj.title || 'Project',
+                youtubeId: ytid,
+                description: obj.description || '',
+                position: parseInt(obj.position) || i,
+                createdAt: obj.createdat || new Date().toISOString()
+              });
+            }
+          }
+          // sort by position within each type
+          list.sort((a, b) => (a.position || 0) - (b.position || 0));
+          videos = list;
+          setStatus(`<i class="bi bi-cloud-check-fill" style="color:#10b981"></i> Sheet connected — ${videos.length} video${videos.length !== 1 ? 's' : ''} loaded.`);
+        } catch (err) {
+          videos = [];
+          setStatus(`<i class="bi bi-exclamation-triangle-fill" style="color:#f59e0b"></i> Could not reach Google Sheet. Working offline.`);
+        }
+      }
 
-          videoGrid.innerHTML = '';
+      // ── Tabs ─────────────────────────────────────────────
+      sidebarTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          activeTab = tab.dataset.tab;
+          sidebarTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          sectionTitle.innerHTML = activeTab === 'long' ? 'Long <span>Videos</span>' : '<span>Shorts</span>';
+          renderGrid();
+        });
+      });
 
-          if (!filtered.length) {
-            videoGrid.innerHTML = `
+      // ── Render ────────────────────────────────────────────
+      function renderGrid() {
+        const filtered = videos.filter(v => v.type === activeTab);
+
+        // Update counts
+        longCount.textContent = videos.filter(v => v.type === 'long').length;
+        shortCount.textContent = videos.filter(v => v.type === 'short').length;
+
+        videoGrid.innerHTML = '';
+
+        if (!filtered.length) {
+          videoGrid.innerHTML = `
         <div class="empty-state">
           <div class="icon"><i class="bi bi-camera-video"></i></div>
           <h3>No ${activeTab === 'long' ? 'long videos' : 'shorts'} yet</h3>
           <p>Click "+ Add Video" to add your first ${activeTab === 'long' ? 'long video' : 'short'}.</p>
         </div>`;
-            return;
-          }
+          return;
+        }
 
-          filtered.forEach((video, index) => {
-            const isShort = video.type === 'short';
-            const card = document.createElement('div');
-            card.className = 'video-card';
-            card.innerHTML = `
+        filtered.forEach((video, index) => {
+          const isShort = video.type === 'short';
+          const card = document.createElement('div');
+          card.className = 'video-card';
+          card.innerHTML = `
         <div class="video-thumb ${isShort ? 'video-thumb-short' : ''}">
           <span class="position-badge">#${index + 1}</span>
           <img src="${thumbUrl(video.youtubeId)}" alt="${escHtml(video.title)}" loading="lazy" onerror="this.style.opacity='0.3'" />
@@ -1428,523 +1473,413 @@
           <button class="btn-edit" data-id="${video.id}"><i class="bi bi-pencil"></i> Edit</button>
           <button class="btn-delete" data-id="${video.id}"><i class="bi bi-trash3"></i> Delete</button>
         </div>`;
-            videoGrid.appendChild(card);
-          });
-
-          // Bind card buttons
-          videoGrid.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', () => openEditModal(btn.dataset.id));
-          });
-          videoGrid.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', () => openConfirm(btn.dataset.id));
-          });
-          videoGrid.querySelectorAll('.btn-move-up').forEach(btn => {
-            btn.addEventListener('click', () => moveVideo(btn.dataset.id, -1));
-          });
-          videoGrid.querySelectorAll('.btn-move-down').forEach(btn => {
-            btn.addEventListener('click', () => moveVideo(btn.dataset.id, 1));
-          });
-        }
-
-        function moveVideo(id, direction) {
-          const videos = getVideos();
-          const curType = activeTab;
-          const currentList = videos.filter(v => v.type === curType);
-          const otherList = videos.filter(v => v.type !== curType);
-
-          const idx = currentList.findIndex(v => v.id === id);
-          if (idx === -1) return;
-          const targetIdx = idx + direction;
-          if (targetIdx < 0 || targetIdx >= currentList.length) return;
-
-          // Swap
-          const item = currentList.splice(idx, 1)[0];
-          currentList.splice(targetIdx, 0, item);
-
-          const combined = curType === 'long' ? [...currentList, ...otherList] : [...otherList, ...currentList];
-          saveVideos(combined);
-          renderGrid();
-          showToast(`Moved "${item.title}" to position #${targetIdx + 1}`, 'success');
-
-          const autoPushUrl = localStorage.getItem('google_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
-          if (autoPushUrl) executePush(autoPushUrl, true);
-        }
-
-        function escHtml(str) {
-          if (!str) return '';
-          return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        }
-
-        // ── Add / Edit Modal ─────────────────────────────────
-        addBtn.addEventListener('click', () => openAddModal());
-
-        function openAddModal() {
-          editId.value = '';
-          fTitle.value = '';
-          fYtid.value = '';
-          fType.value = activeTab;
-          fDesc.value = '';
-          const curCount = getVideos().filter(v => v.type === activeTab).length;
-          if (fPos) fPos.value = curCount + 1; // Default to last position
-          modalTitle.textContent = 'Add Video';
-          updateThumbPreview('');
-          openModal(formModal);
-        }
-
-        function openEditModal(id) {
-          const videos = getVideos();
-          const v = videos.find(x => x.id === id);
-          if (!v) return;
-          editId.value = v.id;
-          fTitle.value = v.title;
-          fYtid.value = v.youtubeId;
-          fType.value = v.type;
-          fDesc.value = v.description || '';
-          const list = videos.filter(x => x.type === v.type);
-          const curIdx = list.findIndex(x => x.id === id);
-          if (fPos) fPos.value = curIdx + 1;
-          modalTitle.textContent = 'Edit Video';
-          updateThumbPreview(v.youtubeId, v.type);
-          openModal(formModal);
-        }
-
-        function openModal(el) { el.classList.add('open'); document.body.style.overflow = 'hidden'; }
-        function closeModal(el) { el.classList.remove('open'); document.body.style.overflow = ''; }
-
-        modalCloseBtn.addEventListener('click', () => closeModal(formModal));
-        formCancelBtn.addEventListener('click', () => closeModal(formModal));
-        formModal.addEventListener('click', e => { if (e.target === formModal) closeModal(formModal); });
-
-        // Live preview
-        fYtid.addEventListener('input', () => {
-          updateThumbPreview(fYtid.value.trim(), fType.value);
+          videoGrid.appendChild(card);
         });
-        fType.addEventListener('change', () => {
-          updateThumbPreview(fYtid.value.trim(), fType.value);
-          if (!editId.value && fPos) {
-            fPos.value = getVideos().filter(v => v.type === fType.value).length + 1;
+
+        // Bind card buttons
+        videoGrid.querySelectorAll('.btn-edit').forEach(btn => {
+          btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+        });
+        videoGrid.querySelectorAll('.btn-delete').forEach(btn => {
+          btn.addEventListener('click', () => openConfirm(btn.dataset.id));
+        });
+        videoGrid.querySelectorAll('.btn-move-up').forEach(btn => {
+          btn.addEventListener('click', () => moveVideo(btn.dataset.id, -1));
+        });
+        videoGrid.querySelectorAll('.btn-move-down').forEach(btn => {
+          btn.addEventListener('click', () => moveVideo(btn.dataset.id, 1));
+        });
+      }
+
+      // ── Persist & Push ───────────────────────────────────
+      function persistVideos(arr, pushRemote = true) {
+        videos = arr;
+        localStorage.setItem(LS_VIDEOS, JSON.stringify(arr));
+        renderGrid();
+        if (pushRemote) {
+          pushToSheet(arr, true);
+        }
+      }
+
+      function pushToSheet(arr, isSilent = false) {
+        const url = localStorage.getItem('google_apps_script_url') || APPS_SCRIPT_URL;
+        if (!url) return;
+        if (pushSpinner) pushSpinner.className = 'bi bi-arrow-repeat spinning';
+        if (!isSilent) showToast('Syncing with Google Sheet...', 'success');
+
+        fetch(url, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(arr)
+        })
+          .then(() => {
+            if (pushSpinner) pushSpinner.className = 'bi bi-cloud-arrow-up-fill';
+            if (!isSilent) showToast(`Synced ${arr.length} videos to Google Sheet!`, 'success');
+            if (syncStatusText) syncStatusText.innerHTML = `<i class="bi bi-cloud-check-fill" style="color:#10b981"></i> Synced with Google Sheet (${arr.length} videos).`;
+          })
+          .catch(err => {
+            if (pushSpinner) pushSpinner.className = 'bi bi-cloud-arrow-up-fill';
+            if (!isSilent) showToast('Could not reach Google Apps Script Web App.', 'error');
+          });
+      }
+
+      // ── Reorder (Move Up / Down) ─────────────────────────
+      function moveVideo(id, direction) {
+        const curType = activeTab;
+        const currentList = videos.filter(v => v.type === curType);
+        const otherList = videos.filter(v => v.type !== curType);
+
+        const idx = currentList.findIndex(v => v.id === id);
+        if (idx === -1) return;
+        const targetIdx = idx + direction;
+        if (targetIdx < 0 || targetIdx >= currentList.length) return;
+
+        // Swap
+        const item = currentList.splice(idx, 1)[0];
+        currentList.splice(targetIdx, 0, item);
+
+        const combined = curType === 'long' ? [...currentList, ...otherList] : [...otherList, ...currentList];
+        persistVideos(combined, true);
+        showToast(`Moved "${item.title}" to position #${targetIdx + 1} & updated Sheet!`, 'success');
+      }
+
+      // ── Add / Edit Modal ─────────────────────────────────
+      addBtn.addEventListener('click', () => openAddModal());
+
+      function openAddModal() {
+        editId.value = '';
+        fTitle.value = '';
+        fYtid.value = '';
+        fType.value = activeTab;
+        fDesc.value = '';
+        const curCount = videos.filter(v => v.type === activeTab).length;
+        if (fPos) fPos.value = curCount + 1; // Default to last position
+        modalTitle.textContent = 'Add Video';
+        updateThumbPreview('');
+        openModal(formModal);
+      }
+
+      function openEditModal(id) {
+        const v = videos.find(x => x.id === id);
+        if (!v) return;
+        editId.value = v.id;
+        fTitle.value = v.title;
+        fYtid.value = v.youtubeId;
+        fType.value = v.type;
+        fDesc.value = v.description || '';
+        const list = videos.filter(x => x.type === v.type);
+        const curIdx = list.findIndex(x => x.id === id);
+        if (fPos) fPos.value = curIdx + 1;
+        modalTitle.textContent = 'Edit Video';
+        updateThumbPreview(v.youtubeId, v.type);
+        openModal(formModal);
+      }
+
+      modalCloseBtn.addEventListener('click', () => closeModal(formModal));
+      formCancelBtn.addEventListener('click', () => closeModal(formModal));
+      formModal.addEventListener('click', e => { if (e.target === formModal) closeModal(formModal); });
+
+      // Live preview
+      fYtid.addEventListener('input', () => {
+        const parsed = extractYouTubeId(fYtid.value.trim());
+        updateThumbPreview(parsed, fType.value);
+      });
+      fType.addEventListener('change', () => {
+        const parsed = extractYouTubeId(fYtid.value.trim());
+        updateThumbPreview(parsed, fType.value);
+        if (!editId.value && fPos) {
+          fPos.value = videos.filter(v => v.type === fType.value).length + 1;
+        }
+      });
+
+      function updateThumbPreview(ytId, type) {
+        thumbPreview.className = 'thumb-preview' + (type === 'short' ? ' short-preview' : '');
+        if (!ytId) {
+          thumbPreview.innerHTML = '<div class="no-preview"><i class="bi bi-image"></i><span>Thumbnail preview</span></div>';
+          return;
+        }
+        thumbPreview.innerHTML = `<img src="${thumbUrl(ytId)}" alt="Preview" onerror="this.parentElement.innerHTML='<div class=\\'no-preview\\'><i class=\\'bi bi-exclamation-circle\\'></i><span>ID not found</span></div>'" />`;
+      }
+
+      formSaveBtn.addEventListener('click', saveVideo);
+
+      function saveVideo() {
+        const title = fTitle.value.trim();
+        const rawYt = fYtid.value.trim();
+        const ytId = extractYouTubeId(rawYt);
+        const type = fType.value;
+        const desc = fDesc.value.trim();
+        const pos = fPos ? parseInt(fPos.value, 10) : NaN;
+
+        if (!title) { shake(fTitle); showToast('Please enter a title.', 'error'); return; }
+        if (!ytId) { shake(fYtid); showToast('Please enter a valid YouTube Video ID or link.', 'error'); return; }
+
+        const id = editId.value;
+        const currentList = videos.filter(v => v.type === type);
+        const otherList = videos.filter(v => v.type !== type);
+
+        let videoObj;
+        if (id) {
+          const existingIdx = currentList.findIndex(v => v.id === id);
+          if (existingIdx !== -1) {
+            videoObj = { ...currentList[existingIdx], title, youtubeId: ytId, type, description: desc };
+            currentList.splice(existingIdx, 1);
+          } else {
+            const oldIdx = otherList.findIndex(v => v.id === id);
+            if (oldIdx !== -1) {
+              videoObj = { ...otherList[oldIdx], title, youtubeId: ytId, type, description: desc };
+              otherList.splice(oldIdx, 1);
+            } else {
+              videoObj = { id: uid(), type, title, youtubeId: ytId, description: desc, createdAt: new Date().toISOString() };
+            }
           }
-        });
+        } else {
+          videoObj = { id: uid(), type, title, youtubeId: ytId, description: desc, createdAt: new Date().toISOString() };
+        }
 
-        function updateThumbPreview(ytId, type) {
-          thumbPreview.className = 'thumb-preview' + (type === 'short' ? ' short-preview' : '');
-          if (!ytId) {
-            thumbPreview.innerHTML = '<div class="no-preview"><i class="bi bi-image"></i><span>Thumbnail preview</span></div>';
+        // Insert at target position (1-based index). If not specified or default, goes to the very end!
+        const targetPos = (!isNaN(pos) && pos >= 1) ? Math.min(pos - 1, currentList.length) : currentList.length;
+        currentList.splice(targetPos, 0, videoObj);
+
+        const combined = type === 'long' ? [...currentList, ...otherList] : [...otherList, ...currentList];
+        closeModal(formModal);
+
+        if (activeTab !== type) {
+          const tab = document.querySelector(`.sidebar-tab[data-tab="${type}"]`);
+          if (tab) tab.click();
+        }
+
+        persistVideos(combined, true);
+        showToast(id ? 'Video updated & synced to Sheet!' : `Video added at position #${targetPos + 1} & synced to Sheet!`, 'success');
+      }
+
+      // ── Delete Confirm ───────────────────────────────────
+      function openConfirm(id) {
+        pendingDeleteId = id;
+        openModal(confirmModal);
+      }
+
+      confirmCancel.addEventListener('click', () => closeModal(confirmModal));
+      confirmModal.addEventListener('click', e => { if (e.target === confirmModal) closeModal(confirmModal); });
+
+      confirmDelete.addEventListener('click', () => {
+        if (!pendingDeleteId) return;
+        const newVideos = videos.filter(v => v.id !== pendingDeleteId);
+        closeModal(confirmModal);
+        pendingDeleteId = null;
+        persistVideos(newVideos, true);
+        showToast('Video deleted & removed from Google Sheet.', 'success');
+      });
+
+      // ── Export / Import ───────────────────────────────────
+      exportBtn.addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(videos, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'portfolio_videos.json'; a.click();
+        URL.revokeObjectURL(url);
+        showToast('JSON exported!', 'success');
+      });
+
+      importBtn.addEventListener('click', () => importInput.click());
+
+      importInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            if (!Array.isArray(data)) throw new Error('Not an array');
+            persistVideos(data, true);
+            showToast('Imported ' + data.length + ' videos & synced to Sheet!', 'success');
+          } catch {
+            showToast('Invalid JSON file.', 'error');
+          }
+          importInput.value = '';
+        };
+        reader.readAsText(file);
+      });
+
+      // ── Direct Push Button ────────────────────────────────
+      if (pushSheetBtn) {
+        pushSheetBtn.addEventListener('click', () => {
+          pushToSheet(videos, false);
+        });
+      }
+
+      // ── Sync Action Buttons ────────────────────────────────
+      // 1. Sync Now button (manually pulls from Google Sheet)
+      if (syncNowBtn) {
+        syncNowBtn.addEventListener('click', async () => {
+          if (syncSpinner) syncSpinner.classList.add('spinning');
+          showToast('Fetching latest from Google Sheet...', 'success');
+          await fetchVideosFromSheet();
+          if (syncSpinner) syncSpinner.classList.remove('spinning');
+          renderGrid();
+          localStorage.setItem(LS_VIDEOS, JSON.stringify(videos));
+          showToast(`Synced ${videos.length} videos from Google Sheet!`, 'success');
+        });
+      }
+
+      // 2. Copy for Sheet button (Copies TSV ready to paste into Google Sheet cell A2)
+      if (copySheetBtn) {
+        copySheetBtn.addEventListener('click', () => {
+          if (!videos.length) {
+            showToast('No videos available to copy.', 'error');
             return;
           }
-          thumbPreview.innerHTML = `<img src="${thumbUrl(ytId)}" alt="Preview" onerror="this.parentElement.innerHTML='<div class=\\'no-preview\\'><i class=\\'bi bi-exclamation-circle\\'></i><span>ID not found</span></div>'" />`;
-        }
+          let tsv = '';
+          videos.forEach((v, idx) => {
+            const isShort = (v.type || '').toLowerCase() === 'short';
+            const ytUrl = isShort
+              ? `https://www.youtube.com/shorts/${v.youtubeId}`
+              : `https://www.youtube.com/watch?v=${v.youtubeId}`;
+            tsv += `${v.id || (idx + 1)}\t${v.type || 'long'}\t${v.title || 'Project'}\t${ytUrl}\t${v.description || ''}\n`;
+          });
 
-        formSaveBtn.addEventListener('click', saveVideo);
-
-        function saveVideo() {
-          const title = fTitle.value.trim();
-          const ytId = fYtid.value.trim();
-          const type = fType.value;
-          const desc = fDesc.value.trim();
-          const pos = fPos ? parseInt(fPos.value, 10) : NaN;
-
-          if (!title) { shake(fTitle); showToast('Please enter a title.', 'error'); return; }
-          if (!ytId) { shake(fYtid); showToast('Please enter a YouTube Video ID.', 'error'); return; }
-
-          const videos = getVideos();
-          const id = editId.value;
-
-          const currentList = videos.filter(v => v.type === type);
-          const otherList = videos.filter(v => v.type !== type);
-
-          let videoObj;
-          if (id) {
-            const existingIdx = currentList.findIndex(v => v.id === id);
-            if (existingIdx !== -1) {
-              videoObj = { ...currentList[existingIdx], title, youtubeId: ytId, type, description: desc };
-              currentList.splice(existingIdx, 1);
-            } else {
-              const oldIdx = otherList.findIndex(v => v.id === id);
-              if (oldIdx !== -1) {
-                videoObj = { ...otherList[oldIdx], title, youtubeId: ytId, type, description: desc };
-                otherList.splice(oldIdx, 1);
-              } else {
-                videoObj = { id: uid(), type, title, youtubeId: ytId, description: desc, createdAt: new Date().toISOString() };
-              }
-            }
-          } else {
-            videoObj = { id: uid(), type, title, youtubeId: ytId, description: desc, createdAt: new Date().toISOString() };
-          }
-
-          // Insert at target position (1-based index). If not specified or default, goes to the very end!
-          const targetPos = (!isNaN(pos) && pos >= 1) ? Math.min(pos - 1, currentList.length) : currentList.length;
-          currentList.splice(targetPos, 0, videoObj);
-
-          const combined = type === 'long' ? [...currentList, ...otherList] : [...otherList, ...currentList];
-          saveVideos(combined);
-          showToast(id ? 'Video updated!' : 'Video added at position #' + (targetPos + 1), 'success');
-
-          if (activeTab !== type) {
-            const tab = document.querySelector(`.sidebar-tab[data-tab="${type}"]`);
-            if (tab) tab.click();
-          }
-
-          closeModal(formModal);
-          renderGrid();
-          const autoPushUrl = localStorage.getItem('google_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
-          if (autoPushUrl) executePush(autoPushUrl, true);
-        }
-
-        // ── Delete Confirm ───────────────────────────────────
-        function openConfirm(id) {
-          pendingDeleteId = id;
-          openModal(confirmModal);
-        }
-
-        confirmCancel.addEventListener('click', () => closeModal(confirmModal));
-        confirmModal.addEventListener('click', e => { if (e.target === confirmModal) closeModal(confirmModal); });
-
-        confirmDelete.addEventListener('click', () => {
-          if (!pendingDeleteId) return;
-          const videos = getVideos().filter(v => v.id !== pendingDeleteId);
-          saveVideos(videos);
-          closeModal(confirmModal);
-          renderGrid();
-          showToast('Video deleted.', 'success');
-          pendingDeleteId = null;
-          const autoPushUrl = localStorage.getItem('google_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
-          if (autoPushUrl) executePush(autoPushUrl, true);
+          navigator.clipboard.writeText(tsv).then(() => {
+            showToast(`Copied ${videos.length} videos to clipboard! Go to Google Sheet cell A2 and press Ctrl+V.`, 'success');
+          }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = tsv;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast(`Copied ${videos.length} videos! Paste in cell A2 of Google Sheet.`, 'success');
+          });
         });
+      }
 
-        // ── Export / Import ───────────────────────────────────
-        exportBtn.addEventListener('click', () => {
-          const data = getVideos();
-          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      // 3. Download CSV for Google Sheet button
+      if (csvBtn) {
+        csvBtn.addEventListener('click', () => {
+          let csv = 'id,type,title,youtubelink,description\n';
+          videos.forEach((v, idx) => {
+            const isShort = (v.type || '').toLowerCase() === 'short';
+            const ytUrl = isShort
+              ? `https://www.youtube.com/shorts/${v.youtubeId}`
+              : `https://www.youtube.com/watch?v=${v.youtubeId}`;
+            const cleanTitle = (v.title || '').replace(/"/g, '""');
+            const cleanDesc = (v.description || '').replace(/"/g, '""');
+            csv += `${v.id || (idx + 1)},${v.type || 'long'},"${cleanTitle}",${ytUrl},"${cleanDesc}"\n`;
+          });
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
-          a.href = url; a.download = 'portfolio_videos.json'; a.click();
+          a.href = url;
+          a.download = 'portfolio_videos.csv';
+          a.click();
           URL.revokeObjectURL(url);
-          showToast('JSON exported!', 'success');
+          showToast('CSV downloaded! In Google Sheet: File > Import > Upload.', 'success');
         });
+      }
 
-        importBtn.addEventListener('click', () => importInput.click());
-
-        importInput.addEventListener('change', e => {
-          const file = e.target.files[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = ev => {
-            try {
-              const data = JSON.parse(ev.target.result);
-              if (!Array.isArray(data)) throw new Error('Not an array');
-              saveVideos(data);
-              renderGrid();
-              showToast('Imported ' + data.length + ' videos!', 'success');
-            } catch {
-              showToast('Invalid JSON file.', 'error');
+      // 4. Configure Google Sheet URL button
+      if (sheetBtn) {
+        sheetBtn.addEventListener('click', () => {
+          const current = localStorage.getItem('google_sheets_csv_url') || SHEET_CSV_URL;
+          const input = prompt('Enter your Google Sheet Published CSV URL:\n(Leave empty to reset to default)', current);
+          if (input !== null) {
+            const trimmed = input.trim();
+            if (trimmed) {
+              localStorage.setItem('google_sheets_csv_url', trimmed);
+              fetchVideosFromSheet().then(() => renderGrid());
+            } else {
+              localStorage.removeItem('google_sheets_csv_url');
+              fetchVideosFromSheet().then(() => renderGrid());
             }
-            importInput.value = '';
-          };
-          reader.readAsText(file);
+          }
         });
+      }
 
-        // ── Google Sheets Sync ─────────────────────────────────
-        const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStxZnzZUjvBQjRIlbroJZWt0zoSE1-AwFVMpvtfToqQhfgzshbWUgIurObpkN3ll-XEiBFSdCjCS9f/pub?gid=0&single=true&output=csv';
+      // 5. Reset to Default button (ONLY when user explicitly asks!)
+      if (resetDefaultBtn) {
+        resetDefaultBtn.addEventListener('click', () => {
+          if (confirm('Are you sure you want to reset all videos and your Google Sheet back to the clean default 16 projects?')) {
+            const defaultVideos = [
+              { id: '1', type: 'long', title: 'Podcast hook', youtubeId: '1Yj80vtI97Q', description: 'Podcast hook edit', createdAt: new Date().toISOString() },
+              { id: '2', type: 'long', title: 'Audi edit', youtubeId: '9j_b0VbPDOY', description: 'Commercial car edit', createdAt: new Date().toISOString() },
+              { id: '3', type: 'long', title: 'Observenow', youtubeId: 'Yg5PuOR4Alk', description: 'Event edit', createdAt: new Date().toISOString() },
+              { id: '4', type: 'long', title: 'Sample video', youtubeId: 'SgQohJ0Lqfw', description: 'Corporate video', createdAt: new Date().toISOString() },
+              { id: '5', type: 'long', title: 'Project 5', youtubeId: 'zcr-xLVKU8I', description: 'Storytelling video', createdAt: new Date().toISOString() },
+              { id: '6', type: 'long', title: 'Project 6', youtubeId: 'HLtdvIg_wWo', description: 'Commercial video', createdAt: new Date().toISOString() },
+              { id: '7', type: 'long', title: 'Project 7', youtubeId: 'cxMQMqzvALY', description: 'Creative edit', createdAt: new Date().toISOString() },
+              { id: '8', type: 'short', title: 'Show up honestly', youtubeId: '45CQ2tHeBYY', description: 'Vertical reel', createdAt: new Date().toISOString() },
+              { id: '9', type: 'short', title: 'Motion graphics', youtubeId: 'lqhDXJiUbBA', description: 'Motion graphics reel', createdAt: new Date().toISOString() },
+              { id: '10', type: 'short', title: 'AI Mic ads', youtubeId: 'XO8-QAc_mxE', description: 'Product ad', createdAt: new Date().toISOString() },
+              { id: '11', type: 'short', title: 'The tatva', youtubeId: '3N0wOA7ffSM', description: 'Narrative short', createdAt: new Date().toISOString() },
+              { id: '12', type: 'short', title: 'Map Animation', youtubeId: 'Wcsalzd5y78', description: 'Map animation short', createdAt: new Date().toISOString() },
+              { id: '13', type: 'short', title: 'Task video', youtubeId: 'ySm_Cj2iLVs', description: 'Lifestyle reel', createdAt: new Date().toISOString() },
+              { id: '14', type: 'short', title: 'Reel Edit 7', youtubeId: 'zsQVjWfUidI', description: 'Social media short', createdAt: new Date().toISOString() },
+              { id: '15', type: 'short', title: 'Reel Edit 8', youtubeId: 'v5VNUACuJw4', description: 'Social media short', createdAt: new Date().toISOString() },
+              { id: '16', type: 'short', title: 'Reel Edit 9', youtubeId: '_wq3_6-r3Og', description: 'Social media short', createdAt: new Date().toISOString() }
+            ];
+            persistVideos(defaultVideos, true);
+            showToast('Reset back to default 16 projects and synced to Sheet!', 'success');
+          }
+        });
+      }
 
-        function extractYouTubeId(urlOrId) {
-          if (!urlOrId) return '';
-          const str = String(urlOrId).trim();
-          const match = str.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/) || str.match(/^([\w-]{11})$/);
-          return match ? match[1] : str;
-        }
+      // ── Apps Script Modal logic ───────────────────────────
+      if (appsScriptCloseBtn) appsScriptCloseBtn.addEventListener('click', () => closeModal(appsScriptModal));
+      if (appsScriptCancelBtn) appsScriptCancelBtn.addEventListener('click', () => closeModal(appsScriptModal));
+      if (appsScriptModal) appsScriptModal.addEventListener('click', e => { if (e.target === appsScriptModal) closeModal(appsScriptModal); });
 
-        function syncGoogleSheet(url, isManual = false) {
-          if (!url) return;
-          if (syncSpinner) syncSpinner.classList.add('spinning');
-          if (isManual) showToast('Connecting to Google Sheet...', 'success');
-          fetch(url)
-            .then(res => res.text())
-            .then(csv => {
-              if (syncSpinner) syncSpinner.classList.remove('spinning');
-              const lines = csv.trim().split(/\r?\n/);
-              if (lines.length > 1) {
-                const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^["']|["']$/g, ''));
-                const list = [];
-                for (let i = 1; i < lines.length; i++) {
-                  if (!lines[i].trim()) continue;
-                  const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/^["']|["']$/g, ''));
-                  const obj = {};
-                  headers.forEach((h, idx) => obj[h] = row[idx] || '');
-                  const raw = obj.youtubelink || obj.youtubeid || obj.link || obj.url || '';
-                  const ytid = extractYouTubeId(raw);
-                  if (ytid) {
-                    list.push({
-                      id: obj.id || ('sheet_' + i),
-                      type: (obj.type || 'long').toLowerCase().trim(),
-                      title: obj.title || 'Project',
-                      youtubeId: ytid,
-                      description: obj.description || '',
-                      createdAt: new Date().toISOString()
-                    });
-                  }
-                }
-                if (list.length > 0) {
-                  if (isManual) {
-                    // Manual sync: overwrite localStorage with sheet data
-                    saveVideos(list);
-                    renderGrid();
-                    if (syncStatusText) syncStatusText.innerHTML = `Live synced with Google Sheet (${list.length} videos).`;
-                    showToast(`Synced ${list.length} videos from Google Sheet!`, 'success');
-                  } else {
-                    // Auto page-load: NEVER touch localStorage. Only update status text.
-                    if (syncStatusText) syncStatusText.innerHTML = `Google Sheet connected (${list.length} videos available). Click "Sync from Sheet" to load.`;
-                  }
-                } else {
-                  if (syncStatusText) syncStatusText.innerHTML = `Google Sheet connected (0 video rows found).`;
-                  if (isManual) showToast('Google Sheet is connected, but no video rows were found. Click "Copy for Sheet" to populate it!', 'error');
-                }
-              } else {
-                if (syncStatusText) syncStatusText.innerHTML = `Google Sheet connected (waiting for rows).`;
-                if (isManual) showToast('Google Sheet has only header row. Click "Copy for Sheet" to populate it!', 'error');
-              }
-            })
-            .catch(err => {
-              if (syncSpinner) syncSpinner.classList.remove('spinning');
-              if (isManual) showToast('Could not fetch Google Sheet CSV. Check internet or link permissions.', 'error');
+      if (copyAppsScriptBtn) {
+        copyAppsScriptBtn.addEventListener('click', () => {
+          if (appsScriptCode) {
+            navigator.clipboard.writeText(appsScriptCode.value).then(() => {
+              showToast('Apps Script code copied to clipboard!', 'success');
             });
-        }
+          }
+        });
+      }
 
-        // ── Direct Push Logic & Apps Script Setup ──────────────
-        const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFCCY4SUIsr621SlaK7LHp7Aa6xujqqHIBlYCvLV6OKrvBmNwOyKA1ZD5c0KPDyU4XIA/exec';
-        const APPS_SCRIPT_CODE = `function doGet(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const data = sheet.getDataRange().getValues();
-  const headers = data[0];
-  const rows = [];
-  for (let i = 1; i < data.length; i++) {
-    const row = {};
-    headers.forEach((h, idx) => row[h] = data[i][idx]);
-    rows.push(row);
-  }
-  return ContentService.createTextOutput(JSON.stringify(rows)).setMimeType(ContentService.MimeType.JSON);
-}
-
-function doPost(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const body = JSON.parse(e.postData.contents);
-  sheet.clearContents();
-  sheet.appendRow(["id", "type", "title", "youtubelink", "description"]);
-  body.forEach((v, idx) => {
-    const isShort = (v.type || '').toLowerCase() === 'short';
-    const ytUrl = v.youtubelink || (isShort ? 'https://www.youtube.com/shorts/' + v.youtubeId : 'https://www.youtube.com/watch?v=' + v.youtubeId);
-    sheet.appendRow([v.id || (idx + 1), v.type || 'long', v.title || '', ytUrl, v.description || '']);
-  });
-  return ContentService.createTextOutput(JSON.stringify({ status: 'success' })).setMimeType(ContentService.MimeType.JSON);
-}`;
-
-        function executePush(scriptUrl, isSilent = false) {
-          const videos = getVideos();
-          if (!videos.length) {
-            if (!isSilent) showToast('No videos available to push.', 'error');
+      if (appsScriptSaveBtn) {
+        appsScriptSaveBtn.addEventListener('click', () => {
+          const val = appsScriptUrlInput.value.trim();
+          if (!val || !val.startsWith('http')) {
+            shake(appsScriptUrlInput);
+            showToast('Please enter a valid Web app URL (starts with https://script.google.com/...)', 'error');
             return;
           }
-          if (pushSpinner) pushSpinner.className = 'bi bi-arrow-repeat spinning';
-          if (!isSilent) showToast('Pushing videos to Google Sheet...', 'success');
-
-          fetch(scriptUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(videos)
-          })
-            .then(() => {
-              if (pushSpinner) pushSpinner.className = 'bi bi-cloud-arrow-up-fill';
-              if (!isSilent) showToast(`Directly pushed ${videos.length} videos to Google Sheet!`, 'success');
-            })
-            .catch(err => {
-              if (pushSpinner) pushSpinner.className = 'bi bi-cloud-arrow-up-fill';
-              if (!isSilent) showToast('Could not reach Google Apps Script Web App.', 'error');
-            });
-        }
-
-        // 0. Push to Sheet button (Direct auto-sync to Google Sheet)
-        if (pushSheetBtn) {
-          pushSheetBtn.addEventListener('click', () => {
-            const saved = localStorage.getItem('google_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
-            executePush(saved);
-          });
-        }
-
-        if (copyAppsScriptBtn) {
-          copyAppsScriptBtn.addEventListener('click', () => {
-            if (appsScriptCode) {
-              navigator.clipboard.writeText(appsScriptCode.value).then(() => {
-                showToast('Apps Script code copied to clipboard!', 'success');
-              });
-            }
-          });
-        }
-
-        if (appsScriptCloseBtn) appsScriptCloseBtn.addEventListener('click', () => closeModal(appsScriptModal));
-        if (appsScriptCancelBtn) appsScriptCancelBtn.addEventListener('click', () => closeModal(appsScriptModal));
-        if (appsScriptModal) appsScriptModal.addEventListener('click', e => { if (e.target === appsScriptModal) closeModal(appsScriptModal); });
-
-        if (appsScriptSaveBtn) {
-          appsScriptSaveBtn.addEventListener('click', () => {
-            const val = appsScriptUrlInput.value.trim();
-            if (!val || !val.startsWith('http')) {
-              shake(appsScriptUrlInput);
-              showToast('Please enter a valid Web app URL (starts with https://script.google.com/...)', 'error');
-              return;
-            }
-            localStorage.setItem('google_apps_script_url', val);
-            closeModal(appsScriptModal);
-            executePush(val);
-          });
-        }
-
-        // ── Sync Action Buttons ────────────────────────────────
-        // 1. Sync Now button
-        if (syncNowBtn) {
-          syncNowBtn.addEventListener('click', () => {
-            const current = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
-            syncGoogleSheet(current, true);
-          });
-        }
-
-        // 2. Copy for Sheet button (Copies table ready to paste into Google Sheet cell A2)
-        if (copySheetBtn) {
-          copySheetBtn.addEventListener('click', () => {
-            const videos = getVideos();
-            if (!videos.length) {
-              showToast('No videos available to copy.', 'error');
-              return;
-            }
-            let tsv = '';
-            videos.forEach((v, idx) => {
-              const isShort = (v.type || '').toLowerCase() === 'short';
-              const ytUrl = isShort
-                ? `https://www.youtube.com/shorts/${v.youtubeId}`
-                : `https://www.youtube.com/watch?v=${v.youtubeId}`;
-              tsv += `${v.id || (idx + 1)}\t${v.type || 'long'}\t${v.title || 'Project'}\t${ytUrl}\t${v.description || ''}\n`;
-            });
-
-            navigator.clipboard.writeText(tsv).then(() => {
-              showToast(`Copied ${videos.length} videos to clipboard! Go to Google Sheet cell A2 and press Ctrl+V.`, 'success');
-            }).catch(() => {
-              const ta = document.createElement('textarea');
-              ta.value = tsv;
-              document.body.appendChild(ta);
-              ta.select();
-              document.execCommand('copy');
-              document.body.removeChild(ta);
-              showToast(`Copied ${videos.length} videos! Paste (Ctrl+V) in cell A2 of Google Sheet.`, 'success');
-            });
-          });
-        }
-
-        // 3. Download CSV for Google Sheet button
-        if (csvBtn) {
-          csvBtn.addEventListener('click', () => {
-            const videos = getVideos();
-            let csv = 'id,type,title,youtubelink,description\n';
-            videos.forEach((v, idx) => {
-              const isShort = (v.type || '').toLowerCase() === 'short';
-              const ytUrl = isShort
-                ? `https://www.youtube.com/shorts/${v.youtubeId}`
-                : `https://www.youtube.com/watch?v=${v.youtubeId}`;
-              const cleanTitle = (v.title || '').replace(/"/g, '""');
-              const cleanDesc = (v.description || '').replace(/"/g, '""');
-              csv += `${v.id || (idx + 1)},${v.type || 'long'},"${cleanTitle}",${ytUrl},"${cleanDesc}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'portfolio_videos.csv';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('CSV downloaded! In Google Sheet: File > Import > Upload.', 'success');
-          });
-        }
-
-        // 4. Configure Google Sheet URL button
-        if (sheetBtn) {
-          sheetBtn.addEventListener('click', () => {
-            const current = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
-            const input = prompt('Enter your Google Sheet Published CSV URL:\n(Leave empty to disconnect and use local storage)', current);
-            if (input !== null) {
-              const trimmed = input.trim();
-              if (trimmed) {
-                localStorage.setItem('google_sheets_csv_url', trimmed);
-                syncGoogleSheet(trimmed, true);
-              } else {
-                localStorage.removeItem('google_sheets_csv_url');
-                showToast('Google Sheet disconnected. Using local storage.');
-                if (syncStatusText) syncStatusText.textContent = 'Using local browser storage.';
-              }
-            }
-          });
-        }
-
-        // 5. Reset to Default button
-        if (resetDefaultBtn) {
-          resetDefaultBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to reset all videos and your Google Sheet back to the clean default 16 projects?')) {
-              const defaultVideos = [
-                { id: '1', type: 'long', title: 'Podcast hook', youtubeId: '1Yj80vtI97Q', description: 'Podcast hook edit', createdAt: new Date().toISOString() },
-                { id: '2', type: 'long', title: 'Audi edit', youtubeId: '9j_b0VbPDOY', description: 'Commercial car edit', createdAt: new Date().toISOString() },
-                { id: '3', type: 'long', title: 'Observenow', youtubeId: 'Yg5PuOR4Alk', description: 'Event edit', createdAt: new Date().toISOString() },
-                { id: '4', type: 'long', title: 'Sample video', youtubeId: 'SgQohJ0Lqfw', description: 'Corporate video', createdAt: new Date().toISOString() },
-                { id: '5', type: 'long', title: 'Project 5', youtubeId: 'zcr-xLVKU8I', description: 'Storytelling video', createdAt: new Date().toISOString() },
-                { id: '6', type: 'long', title: 'Project 6', youtubeId: 'HLtdvIg_wWo', description: 'Commercial video', createdAt: new Date().toISOString() },
-                { id: '7', type: 'long', title: 'Project 7', youtubeId: 'cxMQMqzvALY', description: 'Creative edit', createdAt: new Date().toISOString() },
-                { id: '8', type: 'short', title: 'Show up honestly', youtubeId: '45CQ2tHeBYY', description: 'Vertical reel', createdAt: new Date().toISOString() },
-                { id: '9', type: 'short', title: 'Motion graphics', youtubeId: 'lqhDXJiUbBA', description: 'Motion graphics reel', createdAt: new Date().toISOString() },
-                { id: '10', type: 'short', title: 'AI Mic ads', youtubeId: 'XO8-QAc_mxE', description: 'Product ad', createdAt: new Date().toISOString() },
-                { id: '11', type: 'short', title: 'The tatva', youtubeId: '3N0wOA7ffSM', description: 'Narrative short', createdAt: new Date().toISOString() },
-                { id: '12', type: 'short', title: 'Map Animation', youtubeId: 'Wcsalzd5y78', description: 'Map animation short', createdAt: new Date().toISOString() },
-                { id: '13', type: 'short', title: 'Task video', youtubeId: 'ySm_Cj2iLVs', description: 'Lifestyle reel', createdAt: new Date().toISOString() },
-                { id: '14', type: 'short', title: 'Reel Edit 7', youtubeId: 'zsQVjWfUidI', description: 'Social media short', createdAt: new Date().toISOString() },
-                { id: '15', type: 'short', title: 'Reel Edit 8', youtubeId: 'v5VNUACuJw4', description: 'Social media short', createdAt: new Date().toISOString() },
-                { id: '16', type: 'short', title: 'Reel Edit 9', youtubeId: '_wq3_6-r3Og', description: 'Social media short', createdAt: new Date().toISOString() }
-              ];
-              saveVideos(defaultVideos);
-              renderGrid();
-              showToast('Reset back to default 16 projects!', 'success');
-              const autoPushUrl = localStorage.getItem('google_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
-              if (autoPushUrl) executePush(autoPushUrl, false);
-            }
-          });
-        }
-
-        // ── Toast ─────────────────────────────────────────────
-        function showToast(msg, type = 'success') {
-          const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill';
-          const t = document.createElement('div');
-          t.className = `toast ${type}`;
-          t.innerHTML = `<i class="bi ${icon}"></i> ${msg}`;
-          toastCtr.appendChild(t);
-          setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; t.style.transition = '0.3s'; setTimeout(() => t.remove(), 300); }, 3000);
-        }
-
-        // ── Shake helper ──────────────────────────────────────
-        function shake(el) {
-          el.classList.add('shake');
-          el.style.borderColor = '#ff4d4d';
-          setTimeout(() => { el.classList.remove('shake'); el.style.borderColor = ''; }, 600);
-        }
-
-        // ── Keyboard shortcuts ────────────────────────────────
-        document.addEventListener('keydown', e => {
-          if (e.key === 'Escape') {
-            closeModal(formModal);
-            closeModal(confirmModal);
-          }
+          localStorage.setItem('google_apps_script_url', val);
+          closeModal(appsScriptModal);
+          pushToSheet(videos, false);
         });
+      }
 
-        // ── Init ──────────────────────────────────────────────
+      // ── Keyboard shortcuts ────────────────────────────────
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          closeModal(formModal);
+          closeModal(confirmModal);
+          if (appsScriptModal) closeModal(appsScriptModal);
+        }
+      });
+
+      // ── Init ──────────────────────────────────────────────
+      // 1. Immediately show cached videos if any
+      const cached = localStorage.getItem(LS_VIDEOS);
+      if (cached !== null) {
+        try {
+          videos = JSON.parse(cached) || [];
+        } catch (e) {
+          videos = [];
+        }
         renderGrid();
-        const currentSheet = localStorage.getItem("google_sheets_csv_url") || DEFAULT_SHEET_URL;
-        if (currentSheet) syncGoogleSheet(currentSheet);
+      }
 
-      }) ();
+      // 2. Fetch fresh from Google Sheet
+      fetchVideosFromSheet().then(() => {
+        renderGrid();
+        localStorage.setItem(LS_VIDEOS, JSON.stringify(videos));
+      });
+
+    })();
   </script>
 </body>
 

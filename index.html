@@ -979,7 +979,7 @@
         { id: '16', type: 'short', title: 'Reel Edit 9', youtubeId: '_wq3_6-r3Og', description: 'Social media short' }
       ];
 
-      // 1. Fetch live Google Sheet
+      // 1. Fetch live Google Sheet (source of truth)
       const sheetUrl = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
       if (sheetUrl) {
         fetch(sheetUrl)
@@ -990,7 +990,9 @@
               renderVideos(videosFromSheet);
               localStorage.setItem('portfolio_videos', JSON.stringify(videosFromSheet));
             } else {
-              loadFromLocal();
+              // Sheet is empty — show empty state, do NOT seed defaults
+              renderVideos([]);
+              localStorage.setItem('portfolio_videos', JSON.stringify([]));
             }
           })
           .catch(err => {
@@ -1003,17 +1005,18 @@
 
       function loadFromLocal() {
         const localData = localStorage.getItem('portfolio_videos');
-        if (localData) {
+        if (localData !== null) {
           try {
             const parsed = JSON.parse(localData);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              renderVideos(parsed);
+            if (Array.isArray(parsed)) {
+              renderVideos(parsed); // could be [] — that's fine, shows empty state
               return;
             }
           } catch (e) {
             console.error('Failed to parse portfolio_videos from localStorage', e);
           }
         }
+        // localStorage key doesn't exist at all — first ever visit, use defaults
         renderVideos(DEFAULT_VIDEOS);
         localStorage.setItem('portfolio_videos', JSON.stringify(DEFAULT_VIDEOS));
       }
