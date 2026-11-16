@@ -850,7 +850,7 @@
   </script>
   <!-- ===== END SCROLL PROGRESS JS ===== -->
 
-  <!-- ===== DYNAMIC CMS PORTFOLIO LOADER (LocalStorage + Google Sheets) ===== -->
+  <!-- ===== DYNAMIC CMS PORTFOLIO LOADER (MongoDB Atlas via /api/videos) ===== -->
   <script>
     (function () {
       const container = document.querySelector('.portfolio-container');
@@ -865,8 +865,6 @@
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#39;');
       }
-
-      const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStxZnzZUjvBQjRIlbroJZWt0zoSE1-AwFVMpvtfToqQhfgzshbWUgIurObpkN3ll-XEiBFSdCjCS9f/pub?gid=0&single=true&output=csv';
 
       function extractYouTubeId(urlOrId) {
         if (!urlOrId) return '';
@@ -942,48 +940,18 @@
         }, 60);
       }
 
-      // Parse Google Sheet CSV format: id,type,title,youtubelink,description
-      function parseCSV(text) {
-        const lines = text.trim().split(/\r?\n/);
-        if (lines.length < 2) return [];
-        const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^["']|["']$/g, ''));
-        const list = [];
-        for (let i = 1; i < lines.length; i++) {
-          if (!lines[i].trim()) continue;
-          const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/^["']|["']$/g, ''));
-          const obj = {};
-          headers.forEach((h, idx) => {
-            obj[h] = row[idx] || '';
-          });
-          const rawLink = obj.youtubelink || obj.youtubeid || obj.link || obj.url || '';
-          const ytid = extractYouTubeId(rawLink);
-          if (ytid) {
-            list.push({
-              id: obj.id || ('sheet_' + i),
-              type: (obj.type || 'long').toLowerCase().trim(),
-              title: obj.title || 'Project',
-              youtubeId: ytid,
-              description: obj.description || ''
-            });
+      // Fetch live from MongoDB Atlas
+      fetch('/api/videos')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && Array.isArray(data.videos)) {
+            renderVideos(data.videos);
+          } else {
+            renderVideos([]);
           }
-        }
-        return list;
-      }
-
-      // Clear any stale cached video data from localStorage (we no longer use it)
-      localStorage.removeItem('portfolio_videos');
-
-      // Google Sheet is the ONLY source of truth.
-      // Fetch → render what's there. If empty → show empty. No seeding, no fallbacks.
-      fetch(DEFAULT_SHEET_URL + '&t=' + Date.now())
-        .then(res => res.text())
-        .then(csvText => {
-          const videosFromSheet = parseCSV(csvText);
-          renderVideos(videosFromSheet); // renders empty state if [] — by design
         })
         .catch(err => {
-          console.warn('Google Sheets fetch failed:', err);
-          // On network error only — show a user-friendly message, no seeding
+          console.warn('MongoDB fetch error:', err);
           renderVideos([]);
         });
     })();

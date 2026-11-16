@@ -2,10 +2,11 @@
   "name": "rohitportfolio",
   "version": "1.0.0",
   "scripts": {
-    "start": "npx serve ."
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
-    "bootstrap-icons": "^1.13.1"
+    "bootstrap-icons": "^1.13.1",
+    "mongodb": "^7.9.0"
   }
 }
-
