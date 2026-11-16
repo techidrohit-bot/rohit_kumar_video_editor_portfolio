@@ -876,7 +876,17 @@
       }
 
       function renderVideos(videos) {
-        if (!Array.isArray(videos) || videos.length === 0) return;
+        if (!container) return;
+        if (!Array.isArray(videos) || videos.length === 0) {
+          container.innerHTML = `
+            <div class="col-12 text-center py-5">
+              <div style="font-size: 2.5rem; color: #888; margin-bottom: 12px;"><i class="bi bi-camera-video"></i></div>
+              <h4 style="color: #fff; font-weight: 700;">No videos yet</h4>
+              <p style="color: #888;">Check back soon for new projects.</p>
+            </div>
+          `;
+          return;
+        }
 
         let html = '';
         videos.forEach(v => {
@@ -960,66 +970,22 @@
         return list;
       }
 
-      const DEFAULT_VIDEOS = [
-        { id: '1', type: 'long', title: 'Podcast hook', youtubeId: '1Yj80vtI97Q', description: 'Podcast hook edit' },
-        { id: '2', type: 'long', title: 'Audi edit', youtubeId: '9j_b0VbPDOY', description: 'Commercial car edit' },
-        { id: '3', type: 'long', title: 'Observenow', youtubeId: 'Yg5PuOR4Alk', description: 'Event edit' },
-        { id: '4', type: 'long', title: 'Sample video', youtubeId: 'SgQohJ0Lqfw', description: 'Corporate video' },
-        { id: '5', type: 'long', title: 'Project 5', youtubeId: 'zcr-xLVKU8I', description: 'Storytelling video' },
-        { id: '6', type: 'long', title: 'Project 6', youtubeId: 'HLtdvIg_wWo', description: 'Commercial video' },
-        { id: '7', type: 'long', title: 'Project 7', youtubeId: 'cxMQMqzvALY', description: 'Creative edit' },
-        { id: '8', type: 'short', title: 'Show up honestly', youtubeId: '45CQ2tHeBYY', description: 'Vertical reel' },
-        { id: '9', type: 'short', title: 'Motion graphics', youtubeId: 'lqhDXJiUbBA', description: 'Motion graphics reel' },
-        { id: '10', type: 'short', title: 'AI Mic ads', youtubeId: 'XO8-QAc_mxE', description: 'Product ad' },
-        { id: '11', type: 'short', title: 'The tatva', youtubeId: '3N0wOA7ffSM', description: 'Narrative short' },
-        { id: '12', type: 'short', title: 'Map Animation', youtubeId: 'Wcsalzd5y78', description: 'Map animation short' },
-        { id: '13', type: 'short', title: 'Task video', youtubeId: 'ySm_Cj2iLVs', description: 'Lifestyle reel' },
-        { id: '14', type: 'short', title: 'Reel Edit 7', youtubeId: 'zsQVjWfUidI', description: 'Social media short' },
-        { id: '15', type: 'short', title: 'Reel Edit 8', youtubeId: 'v5VNUACuJw4', description: 'Social media short' },
-        { id: '16', type: 'short', title: 'Reel Edit 9', youtubeId: '_wq3_6-r3Og', description: 'Social media short' }
-      ];
+      // Clear any stale cached video data from localStorage (we no longer use it)
+      localStorage.removeItem('portfolio_videos');
 
-      // 1. Fetch live Google Sheet (source of truth)
-      const sheetUrl = localStorage.getItem('google_sheets_csv_url') || DEFAULT_SHEET_URL;
-      if (sheetUrl) {
-        fetch(sheetUrl)
-          .then(res => res.text())
-          .then(csvText => {
-            const videosFromSheet = parseCSV(csvText);
-            if (videosFromSheet.length > 0) {
-              renderVideos(videosFromSheet);
-              localStorage.setItem('portfolio_videos', JSON.stringify(videosFromSheet));
-            } else {
-              // Sheet is empty — show empty state, do NOT seed defaults
-              renderVideos([]);
-              localStorage.setItem('portfolio_videos', JSON.stringify([]));
-            }
-          })
-          .catch(err => {
-            console.warn('Google Sheets fetch failed, falling back to local storage:', err);
-            loadFromLocal();
-          });
-      } else {
-        loadFromLocal();
-      }
-
-      function loadFromLocal() {
-        const localData = localStorage.getItem('portfolio_videos');
-        if (localData !== null) {
-          try {
-            const parsed = JSON.parse(localData);
-            if (Array.isArray(parsed)) {
-              renderVideos(parsed); // could be [] — that's fine, shows empty state
-              return;
-            }
-          } catch (e) {
-            console.error('Failed to parse portfolio_videos from localStorage', e);
-          }
-        }
-        // localStorage key doesn't exist at all — first ever visit, use defaults
-        renderVideos(DEFAULT_VIDEOS);
-        localStorage.setItem('portfolio_videos', JSON.stringify(DEFAULT_VIDEOS));
-      }
+      // Google Sheet is the ONLY source of truth.
+      // Fetch → render what's there. If empty → show empty. No seeding, no fallbacks.
+      fetch(DEFAULT_SHEET_URL + '&t=' + Date.now())
+        .then(res => res.text())
+        .then(csvText => {
+          const videosFromSheet = parseCSV(csvText);
+          renderVideos(videosFromSheet); // renders empty state if [] — by design
+        })
+        .catch(err => {
+          console.warn('Google Sheets fetch failed:', err);
+          // On network error only — show a user-friendly message, no seeding
+          renderVideos([]);
+        });
     })();
   </script>
 </body>

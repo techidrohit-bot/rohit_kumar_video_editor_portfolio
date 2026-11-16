@@ -329,8 +329,6 @@
     .sync-actions {
       display: flex;
       gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
     }
 
     .btn-sm {
@@ -347,7 +345,6 @@
       align-items: center;
       gap: 5px;
       transition: all var(--transition);
-      white-space: nowrap;
     }
 
     .btn-sm:hover {
@@ -367,98 +364,26 @@
 
     .btn-push {
       background: linear-gradient(135deg, #10b981, #059669) !important;
-      color: white !important;
+      color: #fff !important;
       border: none !important;
       font-weight: 700 !important;
     }
 
     .btn-push:hover {
-      opacity: 0.88;
-      color: white !important;
-      border: none !important;
+      opacity: 0.9;
+      transform: translateY(-1px);
     }
 
     .btn-reset {
-      background: rgba(239, 68, 68, 0.1);
-      border-color: rgba(239, 68, 68, 0.25);
-      color: #f87171;
+      background: rgba(239, 68, 68, 0.12) !important;
+      border-color: rgba(239, 68, 68, 0.3) !important;
+      color: #f87171 !important;
     }
 
     .btn-reset:hover {
-      background: rgba(239, 68, 68, 0.2);
-      border-color: #f87171;
-      color: #f87171;
-    }
-
-    /* ── More dropdown ───────────────────────────────── */
-    .more-menu-wrap {
-      position: relative;
-    }
-
-    .btn-more {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-    }
-
-    .btn-more:hover {
-      color: var(--accent);
-      border-color: var(--accent);
-    }
-
-    .more-menu-dropdown {
-      display: none;
-      position: absolute;
-      top: calc(100% + 6px);
-      right: 0;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 6px;
-      min-width: 180px;
-      z-index: 999;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .more-menu-dropdown.open {
-      display: flex;
-    }
-
-    .more-menu-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 7px;
-      border: none;
-      background: transparent;
-      color: var(--text);
-      font-family: 'Nunito', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: left;
-      width: 100%;
-      transition: background 0.15s;
-    }
-
-    .more-menu-item:hover {
-      background: rgba(176, 96, 255, 0.12);
-      color: var(--accent);
-    }
-
-    .more-menu-item i {
-      font-size: 14px;
-      width: 16px;
-      text-align: center;
-    }
-
-    .more-menu-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 4px 0;
+      background: rgba(239, 68, 68, 0.22) !important;
+      border-color: #ef4444 !important;
+      color: #ff8080 !important;
     }
 
     @keyframes spin {
@@ -1195,33 +1120,17 @@
     <!-- Sync Banner -->
     <div class="sync-banner">
       <p id="sync-status"><i class="bi bi-cloud-check-fill" style="color: #4dff91;"></i> <span
-          id="sync-status-text">Google Sheet connected. Click <strong>Sync from Sheet</strong> to pull live
-          changes.</span></p>
+          id="sync-status-text">Google Sheet connected.</span></p>
       <div class="sync-actions">
-        <!-- Primary actions always visible -->
-        <button class="btn-sm btn-push" id="push-sheet-btn"
-          title="Push all current videos directly to Google Sheet"><i class="bi bi-cloud-arrow-up-fill"
-            id="push-spinner"></i> Push to Sheet</button>
-        <button class="btn-sm accent" id="sync-now-btn" title="Fetch latest videos from Google Sheet"><i
-            class="bi bi-arrow-repeat" id="sync-spinner"></i> Sync from Sheet</button>
-        <button class="btn-sm btn-reset" id="reset-default-btn"
-          title="Reset both Admin and Google Sheet to default 16 projects"><i class="bi bi-arrow-counterclockwise"></i>
-          Reset</button>
-
-        <!-- More dropdown -->
-        <div class="more-menu-wrap" id="more-menu-wrap">
-          <button class="btn-sm btn-more" id="more-menu-btn" title="More options"><i class="bi bi-three-dots"></i> More</button>
-          <div class="more-menu-dropdown" id="more-menu-dropdown">
-            <button class="more-menu-item" id="copy-sheet-btn"><i class="bi bi-clipboard-check"></i> Copy for Sheet</button>
-            <button class="more-menu-item" id="csv-btn"><i class="bi bi-file-earmark-spreadsheet"></i> Download CSV</button>
-            <button class="more-menu-item" id="sheet-btn"><i class="bi bi-link-45deg"></i> Sheet URL</button>
-            <div class="more-menu-divider"></div>
-            <button class="more-menu-item" id="export-btn"><i class="bi bi-download"></i> Export JSON</button>
-            <button class="more-menu-item" id="import-btn"><i class="bi bi-upload"></i> Import JSON</button>
-          </div>
-        </div>
-
-        <input type="file" id="import-input" accept=".json" />
+        <button class="btn-sm btn-push" id="push-sheet-btn" title="Push all videos directly to Google Sheet">
+          <i class="bi bi-cloud-arrow-up-fill" id="push-spinner"></i> Push to Sheet
+        </button>
+        <button class="btn-sm accent" id="sync-now-btn" title="Fetch latest videos from Google Sheet">
+          <i class="bi bi-arrow-repeat" id="sync-spinner"></i> Sync from Sheet
+        </button>
+        <button class="btn-sm btn-reset" id="reset-default-btn" title="Reset to default 16 projects">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        </button>
       </div>
     </div>
 
@@ -1379,7 +1288,7 @@
 
       // ── Constants ──────────────────────────────────────────
       const LS_AUTH = 'admin_auth_rohit';
-      const LS_VIDEOS = 'portfolio_videos';
+      // NOTE: No LS_VIDEOS — Google Sheet is the ONLY database. No localStorage for video data.
 
       // ── Helpers ───────────────────────────────────────────
       function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
@@ -1487,7 +1396,11 @@
           const res = await fetch(SHEET_CSV_URL + '&t=' + Date.now());
           const csv = await res.text();
           const lines = csv.trim().split(/\r?\n/);
-          if (lines.length < 2) { videos = []; return; }
+          if (lines.length < 2) {
+            videos = [];
+            setStatus('<i class="bi bi-cloud-check-fill" style="color:#10b981"></i> Sheet connected — 0 videos (empty).');
+            return;
+          }
           const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^["']|["']$/g, ''));
           const list = [];
           for (let i = 1; i < lines.length; i++) {
@@ -1595,9 +1508,9 @@
       }
 
       // ── Persist & Push ───────────────────────────────────
+      // No localStorage. videos[] in memory + push to Sheet = source of truth.
       function persistVideos(arr, pushRemote = true) {
         videos = arr;
-        localStorage.setItem(LS_VIDEOS, JSON.stringify(arr));
         renderGrid();
         if (pushRemote) {
           pushToSheet(arr, true);
@@ -1776,34 +1689,38 @@
       });
 
       // ── Export / Import ───────────────────────────────────
-      exportBtn.addEventListener('click', () => {
-        const blob = new Blob([JSON.stringify(videos, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'portfolio_videos.json'; a.click();
-        URL.revokeObjectURL(url);
-        showToast('JSON exported!', 'success');
-      });
+      if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+          const blob = new Blob([JSON.stringify(videos, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = 'portfolio_videos.json'; a.click();
+          URL.revokeObjectURL(url);
+          showToast('JSON exported!', 'success');
+        });
+      }
 
-      importBtn.addEventListener('click', () => importInput.click());
+      if (importBtn && importInput) {
+        importBtn.addEventListener('click', () => importInput.click());
 
-      importInput.addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = ev => {
-          try {
-            const data = JSON.parse(ev.target.result);
-            if (!Array.isArray(data)) throw new Error('Not an array');
-            persistVideos(data, true);
-            showToast('Imported ' + data.length + ' videos & synced to Sheet!', 'success');
-          } catch {
-            showToast('Invalid JSON file.', 'error');
-          }
-          importInput.value = '';
-        };
-        reader.readAsText(file);
-      });
+        importInput.addEventListener('change', e => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = ev => {
+            try {
+              const data = JSON.parse(ev.target.result);
+              if (!Array.isArray(data)) throw new Error('Not an array');
+              persistVideos(data, true);
+              showToast('Imported ' + data.length + ' videos & synced to Sheet!', 'success');
+            } catch {
+              showToast('Invalid JSON file.', 'error');
+            }
+            importInput.value = '';
+          };
+          reader.readAsText(file);
+        });
+      }
 
       // ── Direct Push Button ────────────────────────────────
       if (pushSheetBtn) {
@@ -1821,7 +1738,6 @@
           await fetchVideosFromSheet();
           if (syncSpinner) syncSpinner.classList.remove('spinning');
           renderGrid();
-          localStorage.setItem(LS_VIDEOS, JSON.stringify(videos));
           showToast(`Synced ${videos.length} videos from Google Sheet!`, 'success');
         });
       }
@@ -1955,21 +1871,6 @@
         });
       }
 
-      // ── More menu toggle ─────────────────────────────────
-      const moreMenuBtn = document.getElementById('more-menu-btn');
-      const moreMenuDropdown = document.getElementById('more-menu-dropdown');
-      if (moreMenuBtn && moreMenuDropdown) {
-        moreMenuBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          moreMenuDropdown.classList.toggle('open');
-        });
-        document.addEventListener('click', (e) => {
-          if (!moreMenuDropdown.contains(e.target) && e.target !== moreMenuBtn) {
-            moreMenuDropdown.classList.remove('open');
-          }
-        });
-      }
-
       // ── Keyboard shortcuts ────────────────────────────────
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
@@ -1980,21 +1881,21 @@
       });
 
       // ── Init ──────────────────────────────────────────────
-      // 1. Immediately show cached videos if any
-      const cached = localStorage.getItem(LS_VIDEOS);
-      if (cached !== null) {
-        try {
-          videos = JSON.parse(cached) || [];
-        } catch (e) {
-          videos = [];
-        }
-        renderGrid();
-      }
+      // Google Sheet is the ONLY source of truth.
+      // Show loading state → fetch from Sheet → render whatever is there.
+      // No localStorage read. No seeding. If Sheet is empty → empty grid.
+      videoGrid.innerHTML = `
+        <div class="empty-state" id="loading-state">
+          <div class="icon"><i class="bi bi-cloud-arrow-down" style="animation: spin 1s linear infinite; display:inline-block;"></i></div>
+          <h3>Loading from Google Sheet…</h3>
+          <p>Fetching your videos. This takes 1–2 seconds.</p>
+        </div>`;
 
-      // 2. Fetch fresh from Google Sheet
+      // Clear any stale video data from localStorage (migration cleanup)
+      localStorage.removeItem('portfolio_videos');
+
       fetchVideosFromSheet().then(() => {
         renderGrid();
-        localStorage.setItem(LS_VIDEOS, JSON.stringify(videos));
       });
 
     })();
