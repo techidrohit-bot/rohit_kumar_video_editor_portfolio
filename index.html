@@ -940,21 +940,21 @@
         }, 60);
       }
 
-      // Fetch live from MongoDB Atlas
-      fetch('/api/videos')
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.success && Array.isArray(data.videos)) {
-            renderVideos(data.videos);
-          } else {
-            renderVideos([]);
-          }
-        })
-        .catch(err => {
-          console.warn('MongoDB fetch error:', err);
-          renderVideos([]);
-        });
-    })();
+            // Fetch live from MongoDB Atlas
+            fetch('/api/videos')
+              .then(res => res.json())
+              .then(data => {
+                if (data && data.success && Array.isArray(data.videos)) {
+                  renderVideos(data.videos);
+                } else {
+                  renderVideos([]);
+                }
+            })
+            .catch(err => {
+              console.warn('MongoDB fetch error:', err);
+              renderVideos([]);
+            });
+        }) ();
   </script>
 </body>
 
