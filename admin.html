@@ -329,6 +329,8 @@
     .sync-actions {
       display: flex;
       gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     .btn-sm {
@@ -345,6 +347,7 @@
       align-items: center;
       gap: 5px;
       transition: all var(--transition);
+      white-space: nowrap;
     }
 
     .btn-sm:hover {
@@ -360,6 +363,102 @@
 
     .btn-sm.accent:hover {
       background: rgba(176, 96, 255, 0.25);
+    }
+
+    .btn-push {
+      background: linear-gradient(135deg, #10b981, #059669) !important;
+      color: white !important;
+      border: none !important;
+      font-weight: 700 !important;
+    }
+
+    .btn-push:hover {
+      opacity: 0.88;
+      color: white !important;
+      border: none !important;
+    }
+
+    .btn-reset {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.25);
+      color: #f87171;
+    }
+
+    .btn-reset:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #f87171;
+      color: #f87171;
+    }
+
+    /* ── More dropdown ───────────────────────────────── */
+    .more-menu-wrap {
+      position: relative;
+    }
+
+    .btn-more {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .btn-more:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .more-menu-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px;
+      min-width: 180px;
+      z-index: 999;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .more-menu-dropdown.open {
+      display: flex;
+    }
+
+    .more-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      transition: background 0.15s;
+    }
+
+    .more-menu-item:hover {
+      background: rgba(176, 96, 255, 0.12);
+      color: var(--accent);
+    }
+
+    .more-menu-item i {
+      font-size: 14px;
+      width: 16px;
+      text-align: center;
+    }
+
+    .more-menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
     }
 
     @keyframes spin {
@@ -1099,25 +1198,29 @@
           id="sync-status-text">Google Sheet connected. Click <strong>Sync from Sheet</strong> to pull live
           changes.</span></p>
       <div class="sync-actions">
-        <button class="btn-sm" id="push-sheet-btn"
-          style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; font-weight: 700;"
+        <!-- Primary actions always visible -->
+        <button class="btn-sm btn-push" id="push-sheet-btn"
           title="Push all current videos directly to Google Sheet"><i class="bi bi-cloud-arrow-up-fill"
             id="push-spinner"></i> Push to Sheet</button>
         <button class="btn-sm accent" id="sync-now-btn" title="Fetch latest videos from Google Sheet"><i
             class="bi bi-arrow-repeat" id="sync-spinner"></i> Sync from Sheet</button>
-        <button class="btn-sm" id="copy-sheet-btn" title="Copy videos formatted for Google Sheet (Ctrl+V into Row 2)"><i
-            class="bi bi-clipboard-check"></i> Copy for Sheet</button>
-        <button class="btn-sm" id="csv-btn" title="Download CSV for Google Sheet import"><i
-            class="bi bi-file-earmark-spreadsheet"></i> Download CSV</button>
-        <button class="btn-sm" id="sheet-btn" title="View or change Google Sheet published CSV URL"><i
-            class="bi bi-link-45deg"></i> Sheet URL</button>
-        <button class="btn-sm" id="export-btn" title="Download JSON backup"><i class="bi bi-download"></i> Export
-          JSON</button>
-        <button class="btn-sm" id="import-btn" title="Upload JSON backup"><i class="bi bi-upload"></i> Import
-          JSON</button>
-        <button class="btn-sm" id="reset-default-btn"
+        <button class="btn-sm btn-reset" id="reset-default-btn"
           title="Reset both Admin and Google Sheet to default 16 projects"><i class="bi bi-arrow-counterclockwise"></i>
-          Reset to Default</button>
+          Reset</button>
+
+        <!-- More dropdown -->
+        <div class="more-menu-wrap" id="more-menu-wrap">
+          <button class="btn-sm btn-more" id="more-menu-btn" title="More options"><i class="bi bi-three-dots"></i> More</button>
+          <div class="more-menu-dropdown" id="more-menu-dropdown">
+            <button class="more-menu-item" id="copy-sheet-btn"><i class="bi bi-clipboard-check"></i> Copy for Sheet</button>
+            <button class="more-menu-item" id="csv-btn"><i class="bi bi-file-earmark-spreadsheet"></i> Download CSV</button>
+            <button class="more-menu-item" id="sheet-btn"><i class="bi bi-link-45deg"></i> Sheet URL</button>
+            <div class="more-menu-divider"></div>
+            <button class="more-menu-item" id="export-btn"><i class="bi bi-download"></i> Export JSON</button>
+            <button class="more-menu-item" id="import-btn"><i class="bi bi-upload"></i> Import JSON</button>
+          </div>
+        </div>
+
         <input type="file" id="import-input" accept=".json" />
       </div>
     </div>
@@ -1849,6 +1952,21 @@
           localStorage.setItem('google_apps_script_url', val);
           closeModal(appsScriptModal);
           pushToSheet(videos, false);
+        });
+      }
+
+      // ── More menu toggle ─────────────────────────────────
+      const moreMenuBtn = document.getElementById('more-menu-btn');
+      const moreMenuDropdown = document.getElementById('more-menu-dropdown');
+      if (moreMenuBtn && moreMenuDropdown) {
+        moreMenuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          moreMenuDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', (e) => {
+          if (!moreMenuDropdown.contains(e.target) && e.target !== moreMenuBtn) {
+            moreMenuDropdown.classList.remove('open');
+          }
         });
       }
 
